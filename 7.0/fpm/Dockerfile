@@ -31,7 +31,8 @@ RUN apt-get install -y --no-install-recommends \
         libjpeg62-turbo-dev \
         libpng12-dev \
         libmagickwand-dev \
-        imagemagick
+        imagemagick \
+        ghostscript
 
 RUN export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" && \
     docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ && \
@@ -41,6 +42,14 @@ RUN export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" 
 
 # Opcache
 RUN docker-php-ext-install opcache
+
+RUN { \
+    echo "opcache.enable=1"; \
+    echo "opcache.memory_consumption=1024"; \
+    echo "opcache.max_accelerated_files=9000"; \
+    echo "opcache_revalidate_freq=120"; \
+    echo "opcache.interned_strings_buffer=16"; \
+} | tee -a /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
 
 # Tune configs
 RUN sed -e "s/max_children\s*=\s*[[:digit:]]\+/max_children = $FPM_MAX_CHILDREN/" /usr/local/etc/php-fpm.d/www.conf
@@ -75,7 +84,7 @@ RUN apt-get install -y --no-install-recommends postfix
 # CEANUP
 RUN rm -rf /var/lib/apt/lists/*
 
-# RUn
+# RUN
 COPY hiqdev-docker-entrypoint /usr/local/bin
 ENTRYPOINT ["hiqdev-docker-entrypoint"]
 CMD ["php-fpm"]
