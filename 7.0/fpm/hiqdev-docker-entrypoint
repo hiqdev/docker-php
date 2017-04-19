@@ -4,11 +4,11 @@ set -e
 # Update `myhostname` in Postfix in order to send emails
 postconf -e myhostname=$(hostname)
 
-if [ "$ENV" == "dev" ]; then
+if [ "$ENV" = "dev" ]; then
     # Diable Opcache
     echo "Environment is set to DEV"
     echo "[ opcache ] Disabled"
-    sed -e "s/opcache.enable\s*=\s*[[:digit:]]/opcache.enable=0/" /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
+    sed -i "s/opcache.enable\s*=\s*[[:digit:]]/opcache.enable=0/" /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
 fi
 
 # first arg is `-f` or `--some-option`
