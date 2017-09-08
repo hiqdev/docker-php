@@ -60,6 +60,7 @@ RUN sed -i "s/pm.max_spare_servers\s*=\s*[[:digit:]]\+/pm.max_spare_servers = $F
 RUN { \
        echo '[www]'; \
        echo "pm.max_requests = $FPM_MAX_REQUESTS"; \
+       echo 'catch_workers_output = yes'; \
        echo '[global]'; \
        echo "process.max = $FPM_PROCESS_MAX"; \
        echo 'emergency_restart_threshold = 10'; \
@@ -68,13 +69,14 @@ RUN { \
 } | tee -a /usr/local/etc/php-fpm.d/www.conf
 
 RUN { \
+    echo "log_errors = On"; \
     echo "max_execution_time = $PHP_MAX_EXECUTION_TIME"; \
     echo "max_input_vars = $PHP_MAX_INPUT_VARS"; \
     echo "error_reporting = $PHP_ERROR_REPORTING"; \
     echo "post_max_size = $PHP_POST_MAX_SIZE"; \
     echo "upload_max_filesize = $PHP_UPLOAD_MAX_FILESIZE"; \
     echo "session.gc_maxlifetime = $PHP_SESS_GC_MAXLIFETIME"; \
-} | tee /usr/local/etc/php/php.ini
+} | tee -a /usr/local/etc/php/php.ini
 
 # Mailing
 RUN echo "postfix postfix/mailname string $POSTFIX_MAILNAME" | debconf-set-selections
