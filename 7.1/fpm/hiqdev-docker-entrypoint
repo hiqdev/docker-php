@@ -1,0 +1,20 @@
+#!/bin/sh
+set -e
+
+# Update `myhostname` in Postfix in order to send emails
+postconf -e myhostname=$(hostname)
+
+if [ "$ENV" = "dev" ]; then
+    # Diable Opcache
+    echo "Environment is set to DEV"
+    echo "[ opcache ] Disabled"
+    sed -i "s/opcache.enable\s*=\s*[[:digit:]]/opcache.enable=0/" /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
+fi
+
+# first arg is `-f` or `--some-option`
+if [ "${1#-}" != "$1" ]; then
+    set -- php-fpm "$@"
+fi
+
+exec "$@"
+
