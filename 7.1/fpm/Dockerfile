@@ -26,7 +26,6 @@ RUN curl -sS -o /tmp/icu.tar.gz -L http://download.icu-project.org/files/icu4c/5
 RUN docker-php-ext-configure intl --with-icu-dir=/usr/local && \
     docker-php-ext-install intl
 
-
 # GD, Imagick
 RUN apt-get install -y --no-install-recommends \
         libfreetype6-dev \
@@ -44,7 +43,6 @@ RUN export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" 
 
 # Opcache
 RUN docker-php-ext-install opcache
-
 RUN { \
     echo "opcache.enable=1"; \
     echo "opcache.memory_consumption=1024"; \
@@ -52,6 +50,26 @@ RUN { \
     echo "opcache_revalidate_freq=120"; \
     echo "opcache.interned_strings_buffer=16"; \
 } | tee -a /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
+
+# Xdebug
+RUN pecl install xdebug-2.5.5 \
+    && docker-php-ext-enable xdebug
+
+# Disabled XDebug by default
+RUN sed -i "1s/^/;/" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+# Prepare configuration to enable XDebug
+RUN { \
+    echo "xdebug.profiler_enable=0"; \
+    echo "xdebug.remote_autostart=1"; \
+    echo "xdebug.remote_enable=1"; \
+    echo "xdebug.max_nesting_level=500"; \
+    echo "xdebug.remote_host=127.0.0.1"; \
+    echo "xdebug.remote_port=9000"; \
+} | tee -a /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+
+# PostgreSQL
+RUN apt-get install -y --no-install-recommends libpq-dev \
+    && docker-php-ext-install pdo_pgsql pgsql
 
 # Tune configs
 RUN sed -i "s/max_children\s*=\s*[[:digit:]]\+/max_children = $FPM_MAX_CHILDREN/" /usr/local/etc/php-fpm.d/www.conf
