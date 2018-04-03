@@ -74,6 +74,9 @@ RUN apt-get install -y --no-install-recommends libpq-dev \
 # ZIP
 RUN docker-php-ext-install zip
 
+# BCMath
+RUN docker-php-ext-install bcmath
+
 # Tune configs
 RUN sed -i "s/max_children\s*=\s*[[:digit:]]\+/max_children = $FPM_MAX_CHILDREN/" /usr/local/etc/php-fpm.d/www.conf
 RUN sed -i "s/start_servers\s*=\s*[[:digit:]]\+/start_servers = $FPM_START_SERVERS/" /usr/local/etc/php-fpm.d/www.conf
