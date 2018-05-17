@@ -39,6 +39,13 @@ RUN export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" 
     pecl install imagick && \
     docker-php-ext-enable imagick
 
+# ZIP
+RUN docker-php-ext-install zip
+
+# BCMath
+RUN docker-php-ext-install bcmath
+
+# Config
 RUN { \
     echo "log_errors = On"; \
     echo "max_execution_time = $PHP_MAX_EXECUTION_TIME"; \
@@ -56,3 +63,6 @@ RUN apt-get install -y --no-install-recommends postfix
 
 # CEANUP
 RUN rm -rf /var/lib/apt/lists/*
+
+RUN mkdir /app
+WORKDIR /app

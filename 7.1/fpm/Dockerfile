@@ -113,6 +113,9 @@ RUN apt-get install -y --no-install-recommends postfix
 RUN rm -rf /var/lib/apt/lists/*
 
 # RUN
+RUN mkdir /app
+WORKDIR /app
+
 COPY hiqdev-docker-entrypoint /usr/local/bin
 ENTRYPOINT ["hiqdev-docker-entrypoint"]
 CMD ["php-fpm"]
