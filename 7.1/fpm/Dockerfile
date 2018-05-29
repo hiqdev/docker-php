@@ -60,7 +60,7 @@ RUN sed -i "1s/^/;/" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 # Prepare configuration to enable XDebug
 RUN { \
     echo "xdebug.profiler_enable=0"; \
-    echo "xdebug.remote_autostart=1"; \
+    echo "xdebug.remote_autostart=0"; \
     echo "xdebug.remote_enable=1"; \
     echo "xdebug.max_nesting_level=500"; \
     echo "xdebug.remote_host=127.0.0.1"; \
