@@ -22,8 +22,12 @@ RUN apt-get update
 # INTL
 # PHP_CPPFLAGS are used by the docker-php-ext-* scripts
 ENV PHP_CPPFLAGS="$PHP_CPPFLAGS -std=c++11"
-RUN curl -sS -o /tmp/icu.tar.gz -L http://download.icu-project.org/files/icu4c/59.1/icu4c-59_1-src.tgz && tar -zxf /tmp/icu.tar.gz -C /tmp && cd /tmp/icu/source && ./configure --prefix=/usr/local && make && make install
-RUN docker-php-ext-configure intl --with-icu-dir=/usr/local && \
+RUN curl -sS -o /tmp/icu.tar.gz -L http://download.icu-project.org/files/icu4c/59.1/icu4c-59_1-src.tgz && \
+    tar -zxf /tmp/icu.tar.gz -C /tmp && \
+    cd /tmp/icu/source && \
+    ./configure --prefix=/usr/local && \
+    make && make install && \
+    docker-php-ext-configure intl --with-icu-dir=/usr/local && \
     docker-php-ext-install intl
 
 # GD, Imagick
@@ -42,30 +46,29 @@ RUN export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" 
     docker-php-ext-enable imagick
 
 # Opcache
-RUN docker-php-ext-install opcache
-RUN { \
-    echo "opcache.enable=1"; \
-    echo "opcache.memory_consumption=1024"; \
-    echo "opcache.max_accelerated_files=9000"; \
-    echo "opcache_revalidate_freq=120"; \
-    echo "opcache.interned_strings_buffer=16"; \
-} | tee -a /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
+RUN docker-php-ext-install opcache && \
+    { \
+        echo "opcache.enable=1"; \
+        echo "opcache.memory_consumption=1024"; \
+        echo "opcache.max_accelerated_files=9000"; \
+        echo "opcache_revalidate_freq=120"; \
+        echo "opcache.interned_strings_buffer=16"; \
+    } | tee -a /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
 
 # Xdebug
-RUN pecl install xdebug-2.5.5 \
-    && docker-php-ext-enable xdebug
+RUN pecl install xdebug-2.5.5 && \
+    docker-php-ext-enable xdebug
 
 # Disabled XDebug by default
-RUN sed -i "1s/^/;/" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-# Prepare configuration to enable XDebug
-RUN { \
-    echo "xdebug.profiler_enable=0"; \
-    echo "xdebug.remote_autostart=0"; \
-    echo "xdebug.remote_enable=1"; \
-    echo "xdebug.max_nesting_level=500"; \
-    echo "xdebug.remote_host=127.0.0.1"; \
-    echo "xdebug.remote_port=9000"; \
-} | tee -a /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+RUN sed -i "1s/^/;/" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
+    { \
+        echo "xdebug.profiler_enable=0"; \
+        echo "xdebug.remote_autostart=0"; \
+        echo "xdebug.remote_enable=1"; \
+        echo "xdebug.max_nesting_level=500"; \
+        echo "xdebug.remote_host=127.0.0.1"; \
+        echo "xdebug.remote_port=9000"; \
+    } | tee -a /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 # PostgreSQL
 RUN apt-get install -y --no-install-recommends libpq-dev \
@@ -78,36 +81,34 @@ RUN docker-php-ext-install zip
 RUN docker-php-ext-install bcmath
 
 # Tune configs
-RUN sed -i "s/max_children\s*=\s*[[:digit:]]\+/max_children = $FPM_MAX_CHILDREN/" /usr/local/etc/php-fpm.d/www.conf
-RUN sed -i "s/start_servers\s*=\s*[[:digit:]]\+/start_servers = $FPM_START_SERVERS/" /usr/local/etc/php-fpm.d/www.conf
-RUN sed -i "s/min_spare_servers\s*=\s*[[:digit:]]\+/min_spare_servers = $FPM_MIN_SPARE_SERVERS/" /usr/local/etc/php-fpm.d/www.conf
-RUN sed -i "s/pm.max_spare_servers\s*=\s*[[:digit:]]\+/pm.max_spare_servers = $FPM_MAX_SPARE_SERVERS/" /usr/local/etc/php-fpm.d/www.conf
-
-RUN { \
-       echo '[www]'; \
-       echo "pm.max_requests = $FPM_MAX_REQUESTS"; \
-       echo 'catch_workers_output = yes'; \
-       echo '[global]'; \
-       echo "process.max = $FPM_PROCESS_MAX"; \
-       echo 'emergency_restart_threshold = 10'; \
-       echo 'emergency_restart_interval = 2s'; \
-       echo 'process_control_timeout = 10s'; \
-} | tee -a /usr/local/etc/php-fpm.d/www.conf
-
-RUN { \
-    echo "log_errors = On"; \
-    echo "max_execution_time = $PHP_MAX_EXECUTION_TIME"; \
-    echo "max_input_vars = $PHP_MAX_INPUT_VARS"; \
-    echo "error_reporting = $PHP_ERROR_REPORTING"; \
-    echo "post_max_size = $PHP_POST_MAX_SIZE"; \
-    echo "upload_max_filesize = $PHP_UPLOAD_MAX_FILESIZE"; \
-    echo "session.gc_maxlifetime = $PHP_SESS_GC_MAXLIFETIME"; \
-} | tee -a /usr/local/etc/php/php.ini
+RUN sed -i "s/max_children\s*=\s*[[:digit:]]\+/max_children = $FPM_MAX_CHILDREN/" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i "s/start_servers\s*=\s*[[:digit:]]\+/start_servers = $FPM_START_SERVERS/" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i "s/min_spare_servers\s*=\s*[[:digit:]]\+/min_spare_servers = $FPM_MIN_SPARE_SERVERS/" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i "s/pm.max_spare_servers\s*=\s*[[:digit:]]\+/pm.max_spare_servers = $FPM_MAX_SPARE_SERVERS/" /usr/local/etc/php-fpm.d/www.conf && \
+    { \
+        echo '[www]'; \
+        echo "pm.max_requests = $FPM_MAX_REQUESTS"; \
+        echo 'catch_workers_output = yes'; \
+        echo '[global]'; \
+        echo "process.max = $FPM_PROCESS_MAX"; \
+        echo 'emergency_restart_threshold = 10'; \
+        echo 'emergency_restart_interval = 2s'; \
+        echo 'process_control_timeout = 10s'; \
+    } | tee -a /usr/local/etc/php-fpm.d/www.conf && \
+    { \
+        echo "log_errors = On"; \
+        echo "max_execution_time = $PHP_MAX_EXECUTION_TIME"; \
+        echo "max_input_vars = $PHP_MAX_INPUT_VARS"; \
+        echo "error_reporting = $PHP_ERROR_REPORTING"; \
+        echo "post_max_size = $PHP_POST_MAX_SIZE"; \
+        echo "upload_max_filesize = $PHP_UPLOAD_MAX_FILESIZE"; \
+        echo "session.gc_maxlifetime = $PHP_SESS_GC_MAXLIFETIME"; \
+    } | tee -a /usr/local/etc/php/php.ini
 
 # Mailing
-RUN echo "postfix postfix/mailname string $POSTFIX_MAILNAME" | debconf-set-selections
-RUN echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections
-RUN apt-get install -y --no-install-recommends postfix
+RUN echo "postfix postfix/mailname string $POSTFIX_MAILNAME" | debconf-set-selections && \
+    echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections && \
+    apt-get install -y --no-install-recommends postfix
 
 # CEANUP
 RUN rm -rf /var/lib/apt/lists/*
