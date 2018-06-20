@@ -37,7 +37,8 @@ RUN apt-get install -y --no-install-recommends \
         libpng-dev \
         libmagickwand-dev \
         imagemagick \
-        ghostscript
+        ghostscript \
+        net-tools
 
 RUN export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" && \
     docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ && \
