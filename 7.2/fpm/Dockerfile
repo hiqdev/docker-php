@@ -37,8 +37,7 @@ RUN apt-get install -y --no-install-recommends \
         libpng-dev \
         libmagickwand-dev \
         imagemagick \
-        ghostscript \
-        net-tools
+        ghostscript
 
 RUN export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" && \
     docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ && \
@@ -110,6 +109,12 @@ RUN sed -i "s/max_children\s*=\s*[[:digit:]]\+/max_children = $FPM_MAX_CHILDREN/
 RUN echo "postfix postfix/mailname string $POSTFIX_MAILNAME" | debconf-set-selections && \
     echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections && \
     apt-get install -y --no-install-recommends postfix
+
+# Composer
+COPY --from=composer:1.6 /usr/bin/composer /usr/bin/composer
+
+# Command `ip` for entrypoint script
+RUN apt-get install -y --no-install-recommends iproute2
 
 # CEANUP
 RUN rm -rf /var/lib/apt/lists/*
