@@ -68,5 +68,8 @@ RUN echo "postfix postfix/mailname string $POSTFIX_MAILNAME" | debconf-set-selec
 # CEANUP
 RUN rm -rf /var/lib/apt/lists/*
 
+# Composer
+COPY --from=composer:1.6 /usr/bin/composer /usr/bin/composer
+
 RUN mkdir /app
 WORKDIR /app
