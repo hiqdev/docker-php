@@ -43,11 +43,10 @@ RUN export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" 
     pecl install imagick && \
     docker-php-ext-enable imagick
 
-# ZIP
-RUN docker-php-ext-install zip
-
-# BCMath
-RUN docker-php-ext-install bcmath
+# Other extensions: ZIP, BCmath, mailparse
+RUN pecl install mailparse \
+ && docker-php-ext-install zip bcmath \
+ && docker-php-ext-enable mailparse
 
 # Config
 RUN { \

@@ -74,11 +74,10 @@ RUN sed -i "1s/^/;/" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
 RUN apt-get install -y --no-install-recommends libpq-dev \
     && docker-php-ext-install pdo_pgsql pgsql
 
-# ZIP
-RUN docker-php-ext-install zip
-
-# BCMath
-RUN docker-php-ext-install bcmath
+# Other extensions: ZIP, BCmath, mailparse
+RUN pecl install mailparse \
+ && docker-php-ext-install zip bcmath \
+ && docker-php-ext-enable mailparse
 
 # Tune configs
 RUN sed -i "s/max_children\s*=\s*[[:digit:]]\+/max_children = $FPM_MAX_CHILDREN/" /usr/local/etc/php-fpm.d/www.conf && \
