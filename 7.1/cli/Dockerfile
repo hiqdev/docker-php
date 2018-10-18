@@ -24,7 +24,7 @@ RUN docker-php-ext-configure intl --with-icu-dir=/usr/local && \
 RUN apt-get install -y --no-install-recommends \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
-        libpng12-dev \
+        libpng-dev \
         libmagickwand-dev \
         imagemagick \
         ghostscript \
@@ -39,11 +39,10 @@ RUN export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" 
     pecl install imagick && \
     docker-php-ext-enable imagick
 
-# ZIP
-RUN docker-php-ext-install zip
-
-# BCMath
-RUN docker-php-ext-install bcmath
+# Extensions
+RUN apt-get install -y libc-client-dev libkrb5-dev \
+    && docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
+    && docker-php-ext-install zip bcmath imap
 
 # Config
 RUN { \

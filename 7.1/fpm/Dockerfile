@@ -34,7 +34,7 @@ RUN curl -sS -o /tmp/icu.tar.gz -L http://download.icu-project.org/files/icu4c/5
 RUN apt-get install -y --no-install-recommends \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
-        libpng12-dev \
+        libpng-dev \
         libmagickwand-dev \
         imagemagick \
         ghostscript
@@ -74,11 +74,10 @@ RUN sed -i "1s/^/;/" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
 RUN apt-get install -y --no-install-recommends libpq-dev \
     && docker-php-ext-install pdo_pgsql pgsql
 
-# ZIP
-RUN docker-php-ext-install zip
-
-# BCMath
-RUN docker-php-ext-install bcmath
+# Extensions
+RUN apt-get install -y libc-client-dev libkrb5-dev \
+    && docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
+    && docker-php-ext-install zip bcmath imap
 
 # Tune configs
 RUN sed -i "s/max_children\s*=\s*[[:digit:]]\+/max_children = $FPM_MAX_CHILDREN/" /usr/local/etc/php-fpm.d/www.conf && \
