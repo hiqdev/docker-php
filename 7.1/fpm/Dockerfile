@@ -109,6 +109,9 @@ RUN echo "postfix postfix/mailname string $POSTFIX_MAILNAME" | debconf-set-selec
     echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections && \
     apt-get install -y --no-install-recommends postfix
 
+# Command `ip` for entrypoint script
+RUN apt-get install -y --no-install-recommends iproute2
+
 # CEANUP
 RUN rm -rf /var/lib/apt/lists/*
 
