@@ -114,6 +114,9 @@ RUN echo "postfix postfix/mailname string $POSTFIX_MAILNAME" | debconf-set-selec
 # Composer
 COPY --from=composer:1.6 /usr/bin/composer /usr/bin/composer
 
+# Command `ip` for entrypoint script
+RUN apt-get install -y --no-install-recommends iproute2
+
 # CEANUP
 RUN rm -rf /var/lib/apt/lists/*
 

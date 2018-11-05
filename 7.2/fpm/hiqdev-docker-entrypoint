@@ -14,7 +14,7 @@ if [ "$ENV" = "dev" ]; then
     echo "[ xdebug ] Enabled"
     sed -i "1s/^;//" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
     if [ -z "$XDEBUG_REMOTE_HOST" ]; then
-        XDEBUG_REMOTE_HOST="host.docker.internal"
+        XDEBUG_REMOTE_HOST=$(ip route show | awk '/default/ {print $3}')
     fi
     echo "[ xdebug ] Set remote host to $XDEBUG_REMOTE_HOST"
     sed -i "s/xdebug.remote_host\s*=\s*.*/xdebug.remote_host=$XDEBUG_REMOTE_HOST/" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
