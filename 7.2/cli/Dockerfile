@@ -23,7 +23,6 @@ RUN curl -sS -o /tmp/icu.tar.gz -L http://download.icu-project.org/files/icu4c/6
     docker-php-ext-configure intl --with-icu-dir=/usr/local && \
     docker-php-ext-install intl
 
-
 # GD, Imagick
 RUN apt-get install -y --no-install-recommends \
         libfreetype6-dev \
@@ -40,6 +39,7 @@ RUN export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" 
     docker-php-ext-install pdo && \
     docker-php-ext-install pdo_pgsql && \
     docker-php-ext-install pgsql && \
+    docker-php-ext-install sockets && \
     pecl install imagick && \
     docker-php-ext-enable imagick
 
