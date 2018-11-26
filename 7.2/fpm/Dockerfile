@@ -78,7 +78,7 @@ RUN apt-get install -y --no-install-recommends libpq-dev \
 RUN apt-get install -y libc-client-dev libkrb5-dev \
     && pecl install mailparse \
     && docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
-    && docker-php-ext-install zip bcmath imap sockets \
+    && docker-php-ext-install zip bcmath imap sockets soap \
     && docker-php-ext-enable mailparse
 
 # Tune configs
