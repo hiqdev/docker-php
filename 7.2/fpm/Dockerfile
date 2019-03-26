@@ -104,6 +104,7 @@ RUN sed -i "s/max_children\s*=\s*[[:digit:]]\+/max_children = $FPM_MAX_CHILDREN/
         echo "post_max_size = $PHP_POST_MAX_SIZE"; \
         echo "upload_max_filesize = $PHP_UPLOAD_MAX_FILESIZE"; \
         echo "session.gc_maxlifetime = $PHP_SESS_GC_MAXLIFETIME"; \
+        echo "mail.add_x_header = Off"; \
     } | tee -a /usr/local/etc/php/php.ini
 
 # Mailing
