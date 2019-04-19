@@ -18,8 +18,6 @@ ENV PHP_POST_MAX_SIZE 60M
 ENV PHP_UPLOAD_MAX_FILESIZE 25M
 ENV PHP_SESS_GC_MAXLIFETIME 2592000
 
-RUN apt-get update
-
 # INTL
 # PHP_CPPFLAGS are used by the docker-php-ext-* scripts
 ENV CXXFLAGS "-std=c++11"
@@ -34,19 +32,20 @@ RUN curl -sS -o /tmp/icu.tar.gz -L http://download.icu-project.org/files/icu4c/$
     rm -rf /tmp/icu /tmp/icu.tar.gz
 
 # GD, Imagick
-RUN apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y --no-install-recommends \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
         libpng-dev \
         libmagickwand-dev \
         imagemagick \
-        ghostscript
-
-RUN export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" && \
+        ghostscript && \
+    export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" && \
     docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ && \
     docker-php-ext-install gd && \
     pecl install imagick && \
-    docker-php-ext-enable imagick
+    docker-php-ext-enable imagick && \
+    apt-get remove -y libfreetype6-dev libpng-dev libmagickwand-dev libjpeg62-turbo-dev && \
+    rm -rf /var/lib/apt/lists/*
 
 # Opcache
 RUN docker-php-ext-install opcache && \
@@ -59,7 +58,7 @@ RUN docker-php-ext-install opcache && \
     } | tee -a /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
 
 # Xdebug
-RUN pecl install xdebug-2.7.0 && \
+RUN pecl install xdebug-2.7.1 && \
     docker-php-ext-enable xdebug
 
 # Disabled XDebug by default
@@ -74,15 +73,18 @@ RUN sed -i "1s/^/;/" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
     } | tee -a /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 # PostgreSQL
-RUN apt-get install -y --no-install-recommends libpq-dev \
-    && docker-php-ext-install pdo_pgsql pgsql
+RUN apt-get update && apt-get install -y --no-install-recommends libpq-dev && \
+    docker-php-ext-install pdo_pgsql pgsql && \
+    rm -rf /var/lib/apt/lists/*
 
 # Other extensions: ZIP, BCmath, imap, mailparse
-RUN apt-get install -y libc-client-dev libkrb5-dev libzip-dev \
+RUN apt-get update && apt-get install -y libc-client-dev libkrb5-dev libzip-dev \
     && pecl install mailparse \
     && docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
     && docker-php-ext-install zip bcmath imap sockets soap pcntl \
-    && docker-php-ext-enable mailparse
+    && docker-php-ext-enable mailparse \
+    && apt-get remove -y libc-client-dev libkrb5-dev libzip-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Tune configs
 RUN sed -i "s/max_children\s*=\s*[[:digit:]]\+/max_children = $FPM_MAX_CHILDREN/" /usr/local/etc/php-fpm.d/www.conf && \
@@ -113,16 +115,11 @@ RUN sed -i "s/max_children\s*=\s*[[:digit:]]\+/max_children = $FPM_MAX_CHILDREN/
 # Mailing
 RUN echo "postfix postfix/mailname string $POSTFIX_MAILNAME" | debconf-set-selections && \
     echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections && \
-    apt-get install -y --no-install-recommends postfix
+    apt-get update && apt-get install -y --no-install-recommends postfix && \
+    rm -rf /var/lib/apt/lists/*
 
 # Composer
 COPY --from=composer:1.8 /usr/bin/composer /usr/bin/composer
-
-# Command `ip` for entrypoint script
-RUN apt-get install -y --no-install-recommends iproute2
-
-# CEANUP
-RUN rm -rf /var/lib/apt/lists/* /tmp/*
 
 # RUN
 RUN mkdir /app
