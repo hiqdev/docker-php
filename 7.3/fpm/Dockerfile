@@ -31,14 +31,15 @@ RUN curl -sS -o /tmp/icu.tar.gz -L http://download.icu-project.org/files/icu4c/$
     docker-php-ext-install intl && \
     rm -rf /tmp/icu /tmp/icu.tar.gz
 
-# GD, Imagick
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
         libpng-dev \
         libmagickwand-dev \
         imagemagick \
-        ghostscript && \
+        ghostscript \
+        iproute2 \
+        dnsutils && \
     export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" && \
     docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ && \
     docker-php-ext-install gd && \
@@ -58,7 +59,7 @@ RUN docker-php-ext-install opcache && \
     } | tee -a /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
 
 # Xdebug
-RUN pecl install xdebug-2.7.1 && \
+RUN pecl install xdebug-2.7.2 && \
     docker-php-ext-enable xdebug
 
 # Disabled XDebug by default
