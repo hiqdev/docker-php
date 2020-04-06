@@ -8,13 +8,13 @@ if [ "$ENV" != "prod" ]; then
     # Diable Opcache
     echo "Environment is set to DEV"
     echo "[ opcache ] Disabled"
-    sed -i "s/opcache.enable\s*=\s*[[:digit:]]/opcache.enable=0/" /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
+    sed -i "s/opcache.revalidate_freq\s*=\s*[[:digit:]]/opcache.revalidate_freq=0/" /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
 
     # Enable XDebug
     echo "[ xdebug ] Enabled"
     sed -i "1s/^;//" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
     if [ -z "$XDEBUG_REMOTE_HOST" ]; then
-        XDEBUG_REMOTE_HOST=host.docker.internal
+        XDEBUG_REMOTE_HOST=$(ip route show | awk '/default/ {print $3}')
     fi
     echo "[ xdebug ] Set remote host to $XDEBUG_REMOTE_HOST"
 
