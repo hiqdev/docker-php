@@ -1,0 +1,45 @@
+#!/bin/bash
+set -e
+
+# Update `myhostname` in Postfix in order to send emails
+postconf -e myhostname=$(hostname)
+
+if [ "$ENV" != "prod" ]; then
+    # Diable Opcache
+    echo "Environment is set to DEV"
+    echo "[ opcache ] Configuring dev mode"
+    sed -i "s/opcache.revalidate_freq\s*=\s*[[:digit:]]/opcache.revalidate_freq=0/" /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
+
+    # Enable XDebug
+    echo "[ xdebug ] Enabled"
+    sed -i "1s/^;//" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+    if [ -z "$XDEBUG_REMOTE_HOST" ]; then
+        if [ -n "$(dig +short host.docker.internal)" ]; then
+            # MacOS
+            XDEBUG_REMOTE_HOST=$(dig +short host.docker.internal)
+        else
+            # Linux
+            XDEBUG_REMOTE_HOST=$(ip route show | awk '/default/ {print $3}')
+        fi
+    fi
+    echo "[ xdebug ] Set remote host to $XDEBUG_REMOTE_HOST"
+
+    sed -i "s/xdebug.remote_host\s*=\s*.*/xdebug.remote_host=$XDEBUG_REMOTE_HOST/" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+    if [ -n "$XDEBUG_REMOTE_PORT" ]; then
+        echo "[ xdebug ] Set remote port to $XDEBUG_REMOTE_PORT"
+        sed -i "s/xdebug.remote_port\s*=\s*.*/xdebug.remote_port=$XDEBUG_REMOTE_PORT/" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+    fi
+
+    if [ -n "$XDEBUG_REMOTE_AUTOSTART" ]; then
+        echo "[ xdebug ] Set xdebug.remote_autostart to $XDEBUG_REMOTE_AUTOSTART"
+        sed -i "s/xdebug.remote_autostart\s*=\s*.*/xdebug.remote_autostart=$XDEBUG_REMOTE_AUTOSTART/" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+    fi
+fi
+
+# first arg is `-f` or `--some-option`
+if [ "${1#-}" != "$1" ]; then
+    set -- php-fpm "$@"
+fi
+
+exec "$@"
+
