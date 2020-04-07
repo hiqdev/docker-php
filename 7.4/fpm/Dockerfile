@@ -46,7 +46,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     docker-php-ext-install gd && \
     pecl install imagick && \
     docker-php-ext-enable imagick && \
-    apt-get remove -y libfreetype6-dev libpng-dev libmagickwand-dev libjpeg62-turbo-dev && \
+    apt-get remove -y libfreetype6-dev libpng-dev libmagickwand-dev libjpeg62-turbo-dev ghc && \
     rm -rf /var/lib/apt/lists/*
 
 # Opcache
