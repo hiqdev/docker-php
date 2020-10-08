@@ -123,6 +123,9 @@ RUN echo "postfix postfix/mailname string $POSTFIX_MAILNAME" | debconf-set-selec
 # Composer
 COPY --from=composer:1.10.1 /usr/bin/composer /usr/bin/composer
 
+RUN rm -rf /usr/local/etc/php-fpm.d/www.conf
+COPY www.conf /usr/local/etc/php-fpm.d/www.conf
+
 # RUN
 RUN mkdir /app
 WORKDIR /app
