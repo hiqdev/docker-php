@@ -43,14 +43,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     docker-php-ext-install sockets && \
     pecl install imagick && \
     docker-php-ext-enable imagick && \
-    apt-get remove -y libfreetype6-dev libpng-dev libmagickwand-dev libjpeg62-turbo-dev && \
+    apt-get remove -y libfreetype6-dev libpng-dev libmagickwand-dev libjpeg62-turbo-dev ghc && \
     rm -rf /var/lib/apt/lists/*
 
 # Other extensions: ZIP, BCmath, imap, mailparse
-RUN apt-get update && apt-get install -y libc-client-dev libkrb5-dev libzip-dev \
+RUN apt-get update && apt-get install -y libc-client-dev libkrb5-dev libzip-dev libgmp3-dev \
     && pecl install mailparse \
     && docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
-    && docker-php-ext-install zip bcmath imap pcntl soap sockets \
+    && docker-php-ext-install zip bcmath imap pcntl soap sockets gmp \
     && docker-php-ext-enable mailparse \
     && apt-get remove -y libc-client-dev libkrb5-dev libzip-dev \
     && rm -rf /var/lib/apt/lists/*
