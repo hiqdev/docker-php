@@ -8,7 +8,7 @@ if [ "$ENV" != "prod" ]; then
     # Diable Opcache
     echo "Environment is set to DEV"
     echo "[ opcache ] Configuring dev mode"
-    sed -i "s/opcache.revalidate_freq\s*=\s*[[:digit:]]/opcache.revalidate_freq=0/" /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
+    sed -i "s/opcache.revalidate_freq\s*=\s*[[:digit:]]\+/opcache.revalidate_freq=0/" /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
 
     # Enable XDebug
     echo "[ xdebug ] Enabled"
