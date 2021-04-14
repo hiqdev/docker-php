@@ -47,12 +47,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 
 # Other extensions: ZIP, BCmath, imap, mailparse
-RUN apt-get update && apt-get install -y libc-client-dev libkrb5-dev libzip-dev libgmp3-dev \
-    && pecl install mailparse \
+RUN apt-get update && apt-get install -y libc-client-dev libkrb5-dev libzip-dev libgmp3-dev librdkafka-dev \
+    && pecl install mailparse rdkafka \
     && docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
     && docker-php-ext-install zip bcmath imap pcntl soap sockets gmp \
     && docker-php-ext-enable mailparse \
-    && apt-get remove -y libc-client-dev libkrb5-dev libzip-dev \
+    && apt-get remove -y libc-client-dev libkrb5-dev libzip-dev librdkafka-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Config
