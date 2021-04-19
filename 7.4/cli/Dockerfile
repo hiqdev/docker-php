@@ -25,7 +25,7 @@ RUN curl -sS -o /tmp/icu.tar.gz -L https://github.com/unicode-org/icu/releases/d
     docker-php-ext-install intl && \
     rm -rf /tmp/icu /tmp/icu.tar.gz
 
-# GD, Imagick
+# GD, Imagick, SSH2
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
@@ -33,6 +33,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libmagickwand-dev \
         imagemagick \
         ghostscript \
+        ssh2 \
+        libssh2-dev \
+        autoconf \
+        build-base \
         libghc-postgresql-libpq-dev && \
     export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" && \
     docker-php-ext-configure gd --with-freetype --with-jpeg && \
@@ -43,6 +47,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     docker-php-ext-install sockets && \
     pecl install imagick && \
     docker-php-ext-enable imagick && \
+    pecl install ssh2 && \
+    docker-php-ext-enable ssh2 && \
     apt-get remove -y libfreetype6-dev libpng-dev libmagickwand-dev libjpeg62-turbo-dev ghc && \
     rm -rf /var/lib/apt/lists/*
 
