@@ -49,7 +49,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     docker-php-ext-enable imagick && \
     pecl install ssh2-1.2 && \
     docker-php-ext-enable ssh2 && \
-    apt-get remove -y libfreetype6-dev libpng-dev libmagickwand-dev libjpeg62-turbo-dev ghc && \
+    apt-get remove -y libfreetype6-dev libpng-dev libmagickwand-dev libjpeg62-turbo-dev ghc libssh2-1-dev && \
     rm -rf /var/lib/apt/lists/*
 
 # Other extensions: ZIP, BCmath, imap, mailparse
