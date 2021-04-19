@@ -33,10 +33,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libmagickwand-dev \
         imagemagick \
         ghostscript \
-        ssh2 \
-        libssh2-dev \
+        ssh \
+        libssh2-1-dev \
+        libssh2-1 \
         autoconf \
-        build-base \
         libghc-postgresql-libpq-dev && \
     export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" && \
     docker-php-ext-configure gd --with-freetype --with-jpeg && \
@@ -47,7 +47,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     docker-php-ext-install sockets && \
     pecl install imagick && \
     docker-php-ext-enable imagick && \
-    pecl install ssh2 && \
+    pecl install ssh2-1.2 && \
     docker-php-ext-enable ssh2 && \
     apt-get remove -y libfreetype6-dev libpng-dev libmagickwand-dev libjpeg62-turbo-dev ghc && \
     rm -rf /var/lib/apt/lists/*

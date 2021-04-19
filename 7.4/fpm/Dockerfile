@@ -40,16 +40,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         imagemagick \
         ghostscript \
         iproute2 \
-        ssh2 \
-        libssh2-dev \
+        ssh \
+        libssh2-1-dev \
+        libssh2-1 \
         autoconf \
-        build-base \
-        dnsutils && \       
+        dnsutils && \
     export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" && \
     docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-install gd && \
     pecl install imagick && \
-    pecl install ssh2 && \
+    pecl install ssh2-1.2 && \
     docker-php-ext-enable imagick && \
     docker-php-ext-enable ssh2 && \
     apt-get remove -y libfreetype6-dev libpng-dev libmagickwand-dev libjpeg62-turbo-dev ghc && \
