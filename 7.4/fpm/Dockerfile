@@ -91,7 +91,7 @@ RUN apt-get update && apt-get install -y libc-client-dev libkrb5-dev libzip-dev 
     && docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
     && docker-php-ext-install zip bcmath imap sockets soap pcntl gmp \
     && docker-php-ext-enable mailparse rdkafka \
-    && apt-get remove -y libc-client-dev libkrb5-dev libzip-dev librdkafka-dev \
+    && apt-get remove -y libc-client-dev libkrb5-dev libzip-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Tune configs
@@ -131,7 +131,7 @@ RUN echo "postfix postfix/mailname string $POSTFIX_MAILNAME" | debconf-set-selec
     rm -rf /var/lib/apt/lists/*
 
 # Composer
-COPY --from=composer:2.0.11 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.0.13 /usr/bin/composer /usr/bin/composer
 
 # RUN
 RUN mkdir /app
