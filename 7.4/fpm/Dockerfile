@@ -131,7 +131,7 @@ RUN echo "postfix postfix/mailname string $POSTFIX_MAILNAME" | debconf-set-selec
     rm -rf /var/lib/apt/lists/*
 
 # Composer
-COPY --from=composer:2.0.13 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.0 /usr/bin/composer /usr/bin/composer
 
 # RUN
 RUN mkdir /app
