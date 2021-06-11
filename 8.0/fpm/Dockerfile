@@ -1,8 +1,8 @@
-FROM php:7.4-fpm
+FROM php:8.0-fpm
 
 ENV POSTFIX_MAILNAME hiqdev.com
-ENV ICU_RELEASE=66.1
-ENV XDEBUG_RELEASE=2.9.4
+ENV ICU_RELEASE=69.1
+ENV XDEBUG_RELEASE=3.0.4
 
 # PHP-FPM options
 ENV FPM_MAX_CHILDREN 300
@@ -48,8 +48,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" && \
     docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-install gd && \
-    pecl install imagick && \
-    pecl install ssh2-1.2 && \
+
+    # Imagick is not ready to be compiled for PHP 8: https://github.com/Imagick/imagick/issues/358
+    mkdir -p /usr/src/php/ext/imagick && \
+    curl -fsSL https://github.com/Imagick/imagick/archive/448c1cd0d58ba2838b9b6dff71c9b7e70a401b90.tar.gz | tar xvz -C /usr/src/php/ext/imagick --strip 1 && \
+    docker-php-ext-install imagick && \
+
+    pecl install ssh2-1.3.1 && \
     docker-php-ext-enable imagick && \
     docker-php-ext-enable ssh2 && \
     apt-get remove -y libfreetype6-dev libpng-dev libmagickwand-dev libjpeg62-turbo-dev ghc libssh2-1-dev && \
