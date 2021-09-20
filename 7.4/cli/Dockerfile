@@ -1,8 +1,8 @@
 FROM php:7.4-cli
 
 ENV POSTFIX_MAILNAME hiqdev.com
-ENV ICU_RELEASE=66.1
-ENV XDEBUG_RELEASE=2.9.4
+ENV ICU_RELEASE=69.1
+ENV XDEBUG_RELEASE=3.0.4
 
 # PHP-FPM options
 ENV PHP_MAX_EXECUTION_TIME 3000
@@ -37,6 +37,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libssh2-1-dev \
         libssh2-1 \
         autoconf \
+        dnsutils \
+        gnupg2 \
+        lsb-release \
         libghc-postgresql-libpq-dev && \
     export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" && \
     docker-php-ext-configure gd --with-freetype --with-jpeg && \
@@ -81,6 +84,14 @@ RUN echo "postfix postfix/mailname string $POSTFIX_MAILNAME" | debconf-set-selec
 
 # Composer
 COPY --from=composer:2.0 /usr/bin/composer /usr/bin/composer
+
+# PostgreSQL client
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gnupg2 && \
+    sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' && \
+    curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+    apt-get install -y --no-install-recommends postgresql-client && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /app
 WORKDIR /app

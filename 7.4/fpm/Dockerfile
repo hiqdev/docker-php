@@ -1,8 +1,8 @@
 FROM php:7.4-fpm
 
 ENV POSTFIX_MAILNAME hiqdev.com
-ENV ICU_RELEASE=66.1
-ENV XDEBUG_RELEASE=2.9.4
+ENV ICU_RELEASE=69.1
+ENV XDEBUG_RELEASE=3.0.4
 
 # PHP-FPM options
 ENV FPM_MAX_CHILDREN 300
@@ -44,7 +44,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libssh2-1-dev \
         libssh2-1 \
         autoconf \
-        dnsutils && \
+        dnsutils \
+        gnupg2 \
+        lsb-release && \
     export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" && \
     docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-install gd && \
@@ -142,6 +144,13 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && mv /tmp/blackfire/blackfire-*.so $(php -r "echo ini_get ('extension_dir');")/blackfire.so \
     && printf "extension=blackfire.so\nblackfire.agent_socket=tcp://blackfire:8707\n" > $PHP_INI_DIR/conf.d/blackfire.ini \
     && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz
+
+# PostgreSQL client
+RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' \
+  && curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+  && apt-get update \
+  && apt-get install -y --no-install-recommends postgresql-client \
+  && rm -rf /var/lib/apt/lists/*
 
 # RUN
 RUN mkdir /app
