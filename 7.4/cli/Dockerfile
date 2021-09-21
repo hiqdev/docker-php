@@ -1,4 +1,4 @@
-FROM php:7.4-cli
+FROM php:7.4-cli-buster
 
 ENV POSTFIX_MAILNAME hiqdev.com
 ENV ICU_RELEASE=69.1
