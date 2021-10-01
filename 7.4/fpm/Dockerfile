@@ -74,12 +74,11 @@ RUN pecl install "xdebug-$XDEBUG_RELEASE" && \
 # Disabled XDebug by default
 RUN sed -i "1s/^/;/" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
     { \
-        echo "xdebug.profiler_enable=0"; \
-        echo "xdebug.remote_autostart=0"; \
-        echo "xdebug.remote_enable=1"; \
         echo "xdebug.max_nesting_level=500"; \
-        echo "xdebug.remote_host=127.0.0.1"; \
-        echo "xdebug.remote_port=9000"; \
+        echo "xdebug.mode=debug"; \
+        echo "xdebug.client_host=127.0.0.1"; \
+        echo "xdebug.client_port=9003"; \
+        echo "xdebug.start_with_request=trigger"; \
     } | tee -a /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 # PostgreSQL
