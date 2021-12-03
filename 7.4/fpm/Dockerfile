@@ -57,6 +57,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get remove -y libfreetype6-dev libpng-dev libmagickwand-dev libjpeg62-turbo-dev ghc libssh2-1-dev && \
     rm -rf /var/lib/apt/lists/*
 
+# General settings
+RUN { \
+    echo "memory_limit=256M"; \
+} | tee -a /usr/local/etc/php/conf.d/docker-php-general.ini
+
 # Opcache
 RUN docker-php-ext-install opcache && \
     { \
