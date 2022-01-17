@@ -1,8 +1,9 @@
 FROM php:7.4-fpm-buster
 
 ENV POSTFIX_MAILNAME hiqdev.com
-ENV ICU_RELEASE=69.1
-ENV XDEBUG_RELEASE=3.0.4
+ENV ICU_RELEASE=70.1
+ENV XDEBUG_RELEASE=3.1.2
+ENV MEMCACHED_RELEASE=3.1.5
 
 # PHP-FPM options
 ENV FPM_MAX_CHILDREN 300
@@ -155,6 +156,14 @@ RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-
   && apt-get update \
   && apt-get install -y --no-install-recommends postgresql-client \
   && rm -rf /var/lib/apt/lists/*
+
+# Install Memcached
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libmemcached-dev zlib1g-dev \
+    && pecl install memcached-$MEMCACHED_RELEASE \
+    && docker-php-ext-enable memcached \
+    && apt-get remove -y libmemcached-dev zlib1g-dev \
+    && rm -r /var/lib/apt/lists/*
 
 # RUN
 RUN mkdir /app
