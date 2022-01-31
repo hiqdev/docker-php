@@ -11,6 +11,10 @@ if [ "$ENV" != "prod" ]; then
     echo "[ opcache ] Configuring dev mode"
     sed -i "s/opcache.revalidate_freq\s*=\s*[[:digit:]]\+/opcache.revalidate_freq=0/" /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
 
+    # Enable Blackfire
+    echo "[ blackfire ] Enabling Blackfire"
+    sed -i "s/^;//" /usr/local/etc/php/conf.d/blackfire.ini
+
     # Enable XDebug
     echo "[ xdebug ] Enabled"
     sed -i "1s/^;//" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
