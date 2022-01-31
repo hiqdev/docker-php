@@ -99,7 +99,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends libmemcached-dev zlib1g-dev \
     && pecl install memcached-$MEMCACHED_RELEASE \
     && docker-php-ext-enable memcached \
-    && apt-get remove -y libmemcached-dev zlib1g-dev \
+    && apt-get remove -y zlib1g-dev \
     && rm -r /var/lib/apt/lists/*
 
 
