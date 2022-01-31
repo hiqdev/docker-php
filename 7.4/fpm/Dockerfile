@@ -94,7 +94,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends libpq-dev && \
 
 # Other extensions: ZIP, BCmath, imap, mailparse
 RUN apt-get update && apt-get install -y libc-client-dev libkrb5-dev libzip-dev libgmp3-dev librdkafka-dev \
-    && pecl install mailparse rdkafka \
+    && pecl install mailparse rdkafka-5.0.2 \
     && docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
     && docker-php-ext-install zip bcmath imap sockets soap pcntl gmp \
     && docker-php-ext-enable mailparse rdkafka \
