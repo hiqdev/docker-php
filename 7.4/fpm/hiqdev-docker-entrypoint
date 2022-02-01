@@ -12,32 +12,36 @@ if [ "$ENV" != "prod" ]; then
     sed -i "s/opcache.revalidate_freq\s*=\s*[[:digit:]]\+/opcache.revalidate_freq=0/" /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
 
     # Enable Blackfire
-    echo "[ blackfire ] Enabling Blackfire"
-    sed -i "s/^;//" /usr/local/etc/php/conf.d/blackfire.ini
+    if [ "$PHP_BLACKFIRE_ENABLED" = "1" ]; then
+        echo "[ blackfire ] Enabling Blackfire"
+        sed -i "s/^;//" /usr/local/etc/php/conf.d/blackfire.ini
+    fi
 
-    # Enable XDebug
-    echo "[ xdebug ] Enabled"
-    sed -i "1s/^;//" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-    if [ -z "$XDEBUG_CLIENT_HOST" ]; then
-        if [ -n "$(dig +short host.docker.internal)" ]; then
-            # MacOS
-            XDEBUG_CLIENT_HOST=$(dig +short host.docker.internal)
-        else
-            # Linux
-            XDEBUG_CLIENT_HOST=$(ip route show | awk '/default/ {print $3}')
+    # Enable XDebug if not disabled explicitly
+    if [ "$PHP_XDEBUG_ENABLED" != "0" ]; then
+        echo "[ xdebug ] Enabled"
+        sed -i "1s/^;//" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+        if [ -z "$XDEBUG_CLIENT_HOST" ]; then
+            if [ -n "$(dig +short host.docker.internal)" ]; then
+                # MacOS
+                XDEBUG_CLIENT_HOST=$(dig +short host.docker.internal)
+            else
+                # Linux
+                XDEBUG_CLIENT_HOST=$(ip route show | awk '/default/ {print $3}')
+            fi
         fi
-    fi
-    echo "[ xdebug ] Set client host to $XDEBUG_CLIENT_HOST"
+        echo "[ xdebug ] Set client host to $XDEBUG_CLIENT_HOST"
 
-    sed -i "s/xdebug.client_host\s*=\s*.*/xdebug.client_host=$XDEBUG_CLIENT_HOST/" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-    if [ -n "$XDEBUG_CLIENT_PORT" ]; then
-        echo "[ xdebug ] Set client port to $XDEBUG_CLIENT_PORT"
-        sed -i "s/xdebug.client_port\s*=\s*.*/xdebug.client_port=$XDEBUG_CLIENT_PORT/" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-    fi
+        sed -i "s/xdebug.client_host\s*=\s*.*/xdebug.client_host=$XDEBUG_CLIENT_HOST/" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+        if [ -n "$XDEBUG_CLIENT_PORT" ]; then
+            echo "[ xdebug ] Set client port to $XDEBUG_CLIENT_PORT"
+            sed -i "s/xdebug.client_port\s*=\s*.*/xdebug.client_port=$XDEBUG_CLIENT_PORT/" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+        fi
 
-    if [ -n "$XDEBUG_START_WITH_REQUEST" ]; then
-        echo "[ xdebug ] Set xdebug.remote_autostart to $XDEBUG_START_WITH_REQUEST"
-        sed -i "s/xdebug.start_with_request\s*=\s*.*/xdebug.start_with_request=$XDEBUG_START_WITH_REQUEST" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+        if [ -n "$XDEBUG_START_WITH_REQUEST" ]; then
+            echo "[ xdebug ] Set xdebug.remote_autostart to $XDEBUG_START_WITH_REQUEST"
+            sed -i "s/xdebug.start_with_request\s*=\s*.*/xdebug.start_with_request=$XDEBUG_START_WITH_REQUEST" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+        fi
     fi
 fi
 
