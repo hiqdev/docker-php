@@ -1,8 +1,9 @@
-FROM php:8.0-fpm
+FROM php:8.0-fpm-bullseye
 
 ENV POSTFIX_MAILNAME hiqdev.com
-ENV ICU_RELEASE=69.1
-ENV XDEBUG_RELEASE=3.0.4
+ENV ICU_RELEASE=70.1
+ENV XDEBUG_RELEASE=3.1.2
+ENV MEMCACHED_RELEASE=3.1.5
 
 # PHP-FPM options
 ENV FPM_MAX_CHILDREN 300
@@ -44,7 +45,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libssh2-1-dev \
         libssh2-1 \
         autoconf \
-        dnsutils && \
+        dnsutils \
+        gnupg2 \
+        lsb-release \
+        unzip && \
     export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" && \
     docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-install gd && \
@@ -59,6 +63,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     docker-php-ext-enable ssh2 && \
     apt-get remove -y libfreetype6-dev libpng-dev libmagickwand-dev libjpeg62-turbo-dev ghc libssh2-1-dev && \
     rm -rf /var/lib/apt/lists/*
+
+# General settings
+RUN { \
+    echo "memory_limit=256M"; \
+} | tee -a /usr/local/etc/php/conf.d/docker-php-general.ini
 
 # Opcache
 RUN docker-php-ext-install opcache && \
@@ -77,26 +86,30 @@ RUN pecl install "xdebug-$XDEBUG_RELEASE" && \
 # Disabled XDebug by default
 RUN sed -i "1s/^/;/" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
     { \
-        echo "xdebug.profiler_enable=0"; \
-        echo "xdebug.remote_autostart=0"; \
-        echo "xdebug.remote_enable=1"; \
         echo "xdebug.max_nesting_level=500"; \
-        echo "xdebug.remote_host=127.0.0.1"; \
-        echo "xdebug.remote_port=9000"; \
-    } | tee -a /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+        echo "xdebug.mode=debug"; \
+        echo "xdebug.client_host=127.0.0.1"; \
+        echo "xdebug.client_port=9003"; \
+        echo "xdebug.start_with_request=trigger"; \
+} | tee -a /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 # PostgreSQL
 RUN apt-get update && apt-get install -y --no-install-recommends libpq-dev && \
     docker-php-ext-install pdo_pgsql pgsql && \
     rm -rf /var/lib/apt/lists/*
 
+# Temp patch. See https://github.com/php/php-src/issues/7986
+COPY php-socket.patch /tmp/php-socket.patch
+
 # Other extensions: ZIP, BCmath, imap, mailparse
 RUN apt-get update && apt-get install -y libc-client-dev libkrb5-dev libzip-dev libgmp3-dev librdkafka-dev \
-    && pecl install mailparse rdkafka \
+    && pecl install mailparse rdkafka-5.0.2 \
     && docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
-    && docker-php-ext-install zip bcmath imap sockets soap pcntl gmp \
+    && docker-php-source extract && patch /usr/src/php/ext/sockets/config.m4 -i /tmp/php-socket.patch \
+    && docker-php-ext-install zip bcmath imap soap pcntl gmp sockets \
     && docker-php-ext-enable mailparse rdkafka \
     && apt-get remove -y libc-client-dev libkrb5-dev libzip-dev \
+    && docker-php-source delete \
     && rm -rf /var/lib/apt/lists/*
 
 # Tune configs
@@ -145,8 +158,23 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && mkdir -p /tmp/blackfire \
     && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp/blackfire \
     && mv /tmp/blackfire/blackfire-*.so $(php -r "echo ini_get ('extension_dir');")/blackfire.so \
-    && printf "extension=blackfire.so\nblackfire.agent_socket=tcp://blackfire:8707\n" > $PHP_INI_DIR/conf.d/blackfire.ini \
+    && printf ";extension=blackfire.so\nblackfire.agent_socket=tcp://blackfire:8707\n" > $PHP_INI_DIR/conf.d/blackfire.ini \
     && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz
+
+# PostgreSQL client
+RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' \
+  && curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+  && apt-get update \
+  && apt-get install -y --no-install-recommends postgresql-client \
+  && rm -rf /var/lib/apt/lists/*
+
+# Install Memcached
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libmemcached-dev zlib1g-dev \
+    && pecl install memcached-$MEMCACHED_RELEASE \
+    && docker-php-ext-enable memcached \
+    && apt-get remove -y zlib1g-dev \
+    && rm -r /var/lib/apt/lists/*
 
 # RUN
 RUN mkdir /app
