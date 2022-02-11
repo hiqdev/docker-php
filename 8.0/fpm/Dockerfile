@@ -39,6 +39,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libpng-dev \
         libmagickwand-dev \
         imagemagick \
+        git \
         ghostscript \
         iproute2 \
         ssh \

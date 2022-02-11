@@ -1,6 +1,6 @@
 VERSION = 7.4
 
-builds = fpm cli cli-dev
+builds = fpm cli cli-dev fpm-alpine
 
 all: $(builds) push_$(builds)
 

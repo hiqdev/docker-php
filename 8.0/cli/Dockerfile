@@ -1,8 +1,9 @@
-FROM php:8.0-cli
+FROM php:8.0-cli-bullseye
 
 ENV POSTFIX_MAILNAME hiqdev.com
-ENV ICU_RELEASE=69.1
-ENV XDEBUG_RELEASE=3.0.4
+ENV ICU_RELEASE=70.1
+ENV XDEBUG_RELEASE=3.1.2
+ENV MEMCACHED_RELEASE=3.1.5
 
 # PHP-FPM options
 ENV PHP_MAX_EXECUTION_TIME 3000
@@ -37,6 +38,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libssh2-1-dev \
         libssh2-1 \
         autoconf \
+        dnsutils \
+        gnupg2 \
+        lsb-release \
         libghc-postgresql-libpq-dev && \
     export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" && \
     docker-php-ext-configure gd --with-freetype --with-jpeg && \
@@ -54,7 +58,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pecl install ssh2-1.3.1 && \
     docker-php-ext-enable imagick && \
     docker-php-ext-enable ssh2 && \
-
     apt-get remove -y libfreetype6-dev libpng-dev libmagickwand-dev libjpeg62-turbo-dev ghc libssh2-1-dev && \
     rm -rf /var/lib/apt/lists/*
 
@@ -87,6 +90,23 @@ RUN echo "postfix postfix/mailname string $POSTFIX_MAILNAME" | debconf-set-selec
 
 # Composer
 COPY --from=composer:2.0 /usr/bin/composer /usr/bin/composer
+
+# PostgreSQL client
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gnupg2 && \
+    sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' && \
+    curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+    apt-get install -y --no-install-recommends postgresql-client && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Memcached
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libmemcached-dev zlib1g-dev \
+    && pecl install memcached-$MEMCACHED_RELEASE \
+    && docker-php-ext-enable memcached \
+    && apt-get remove -y zlib1g-dev \
+    && rm -r /var/lib/apt/lists/*
+
 
 RUN mkdir /app
 WORKDIR /app
