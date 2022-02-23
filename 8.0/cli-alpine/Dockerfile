@@ -13,9 +13,6 @@ ENV PHP_POST_MAX_SIZE 60M
 ENV PHP_UPLOAD_MAX_FILESIZE 25M
 ENV PHP_SESS_GC_MAXLIFETIME 2592000
 
-# Temp patch. See https://github.com/php/php-src/issues/7986
-COPY php-socket.patch /tmp/php-socket.patch
-
 RUN set -xe \
     && apk update \
     && apk add --no-cache --virtual .php-deps \
@@ -99,10 +96,7 @@ RUN set -xe \
     && docker-php-ext-enable memcached \
 
     # Sockets
-    && docker-php-source extract \
-    && patch /usr/src/php/ext/sockets/config.m4 -i /tmp/php-socket.patch \
     && docker-php-ext-install sockets \
-    && docker-php-source delete \
 
     # Blackfire
     && version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
@@ -116,9 +110,13 @@ RUN set -xe \
     && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz \
     && echo 'Blackfire has been installed' \
 
+    && apk add gnu-libiconv=1.15-r3 --update-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.13/community/ --allow-untrusted
+
     && { find /usr/local/lib -type f -print0 | xargs -0r strip --strip-all -p 2>/dev/null || true; } \
     && apk del .build-deps \
-    && rm -rf /tmp/* /usr/local/lib/php/doc/* /var/cache/apk/*
+    && rm -rf /tmp/* /usr/local/lib/php/doc/* /var/cache/apk/* \
+
+ENV LD_PRELOAD /usr/lib/preloadable_libiconv.so
 
 # General settings
 RUN { \
@@ -153,9 +151,6 @@ RUN { \
         echo "session.gc_maxlifetime = $PHP_SESS_GC_MAXLIFETIME"; \
         echo "mail.add_x_header = Off"; \
     } | tee -a /usr/local/etc/php/php.ini
-
-# Composer
-COPY --from=composer:2.0 /usr/bin/composer /usr/bin/composer
 
 # Composer
 COPY --from=composer:2.0 /usr/bin/composer /usr/bin/composer
