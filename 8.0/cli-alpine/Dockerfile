@@ -110,7 +110,7 @@ RUN set -xe \
     && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz \
     && echo 'Blackfire has been installed' \
 
-    && apk add gnu-libiconv=1.15-r3 --update-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.13/community/ --allow-untrusted
+    && apk add gnu-libiconv=1.15-r3 --update-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.13/community/ --allow-untrusted \
 
     && { find /usr/local/lib -type f -print0 | xargs -0r strip --strip-all -p 2>/dev/null || true; } \
     && apk del .build-deps \
