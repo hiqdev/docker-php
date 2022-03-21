@@ -1,4 +1,4 @@
-FROM php:7.4-fpm-alpine
+FROM php:8.0-fpm-alpine
 
 ENV POSTFIX_MAILNAME hiqdev.com
 ENV ICU_RELEASE=70.1
@@ -74,10 +74,7 @@ RUN set -xe \
     docker-php-ext-install zip bcmath imap soap pcntl gmp && \
     docker-php-ext-enable mailparse && \
 
-    # Imagick is not ready to be compiled for PHP 8: https://github.com/Imagick/imagick/issues/358
-    mkdir -p /usr/src/php/ext/imagick && \
-    curl -fsSL https://github.com/Imagick/imagick/archive/448c1cd0d58ba2838b9b6dff71c9b7e70a401b90.tar.gz | tar xvz -C /usr/src/php/ext/imagick --strip 1 && \
-    docker-php-ext-install imagick && \
+    pecl install imagick && \
     docker-php-ext-enable imagick && \
 
     # SSH

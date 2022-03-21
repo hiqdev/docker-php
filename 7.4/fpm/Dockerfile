@@ -38,6 +38,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libjpeg62-turbo-dev \
         libpng-dev \
         libmagickwand-dev \
+        libmcrypt \
         imagemagick \
         ghostscript \
         iproute2 \
@@ -53,7 +54,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     docker-php-ext-install gd && \
     pecl install imagick && \
     pecl install ssh2-1.2 && \
-    docker-php-ext-enable imagick && \
+    pecl install mcrypt && \
+    docker-php-ext-enable imagick mcrypt && \
     docker-php-ext-enable ssh2 && \
     apt-get remove -y libfreetype6-dev libpng-dev libmagickwand-dev libjpeg62-turbo-dev ghc libssh2-1-dev && \
     rm -rf /var/lib/apt/lists/*

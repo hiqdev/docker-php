@@ -1,28 +1,17 @@
-FROM php:7.4-fpm-alpine
+FROM php:8.1-cli-alpine
 
 ENV POSTFIX_MAILNAME hiqdev.com
 ENV ICU_RELEASE=70.1
 ENV XDEBUG_RELEASE=3.1.2
 ENV MEMCACHED_RELEASE=3.1.5
 
-# PHP-FPM options
-ENV FPM_MAX_CHILDREN 300
-ENV FPM_START_SERVERS 50
-ENV FPM_MIN_SPARE_SERVERS 20
-ENV FPM_MAX_SPARE_SERVERS 50
-ENV FPM_MAX_REQUESTS 10000
-ENV FPM_PROCESS_MAX 512
-
-# PHP Options
+# PHP options
 ENV PHP_MAX_EXECUTION_TIME 3000
 ENV PHP_MAX_INPUT_VARS 20000
-ENV PHP_ERROR_REPORTING="E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_NOTICE"
+ENV PHP_ERROR_REPORTING="E_ALL & ~E_NOTICE"
 ENV PHP_POST_MAX_SIZE 60M
 ENV PHP_UPLOAD_MAX_FILESIZE 25M
 ENV PHP_SESS_GC_MAXLIFETIME 2592000
-
-# Temp patch. See https://github.com/php/php-src/issues/7986
-COPY php-socket.patch /tmp/php-socket.patch
 
 RUN set -xe \
     && apk update \
@@ -74,10 +63,7 @@ RUN set -xe \
     docker-php-ext-install zip bcmath imap soap pcntl gmp && \
     docker-php-ext-enable mailparse && \
 
-    # Imagick is not ready to be compiled for PHP 8: https://github.com/Imagick/imagick/issues/358
-    mkdir -p /usr/src/php/ext/imagick && \
-    curl -fsSL https://github.com/Imagick/imagick/archive/448c1cd0d58ba2838b9b6dff71c9b7e70a401b90.tar.gz | tar xvz -C /usr/src/php/ext/imagick --strip 1 && \
-    docker-php-ext-install imagick && \
+    pecl install imagick && \
     docker-php-ext-enable imagick && \
 
     # SSH
@@ -107,10 +93,7 @@ RUN set -xe \
     && docker-php-ext-enable memcached \
 
     # Sockets
-    && docker-php-source extract \
-    && patch /usr/src/php/ext/sockets/config.m4 -i /tmp/php-socket.patch \
     && docker-php-ext-install sockets \
-    && docker-php-source delete \
 
     # Blackfire
     && version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
@@ -128,7 +111,7 @@ RUN set -xe \
 
     && { find /usr/local/lib -type f -print0 | xargs -0r strip --strip-all -p 2>/dev/null || true; } \
     && apk del .build-deps \
-    && rm -rf /tmp/* /usr/local/lib/php/doc/* /var/cache/apk/*
+    && rm -rf /tmp/* /usr/local/lib/php/doc/* /var/cache/apk/* \
 
 ENV LD_PRELOAD /usr/lib/preloadable_libiconv.so
 
@@ -155,27 +138,6 @@ RUN { \
         echo "xdebug.start_with_request=trigger"; \
     } | tee -a /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && \
-
-    # Tune configs
-    sed -i "s/max_children\s*=\s*[[:digit:]]\+/max_children = $FPM_MAX_CHILDREN/" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i "s/start_servers\s*=\s*[[:digit:]]\+/start_servers = $FPM_START_SERVERS/" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i "s/min_spare_servers\s*=\s*[[:digit:]]\+/min_spare_servers = $FPM_MIN_SPARE_SERVERS/" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i "s/pm.max_spare_servers\s*=\s*[[:digit:]]\+/pm.max_spare_servers = $FPM_MAX_SPARE_SERVERS/" /usr/local/etc/php-fpm.d/www.conf && \
-
-    # FPM monitoring
-    sed -i "s/.*pm.status_path = .*$/pm.status_path = \/fpm_status/g" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i "s/.*ping.path = .*$/ping.path = \/fpm_ping/g" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i "s/.*ping.response = .*$/ping.response = pong/g" /usr/local/etc/php-fpm.d/www.conf && \
-    { \
-        echo '[www]'; \
-        echo "pm.max_requests = $FPM_MAX_REQUESTS"; \
-        echo 'catch_workers_output = yes'; \
-        echo '[global]'; \
-        echo "process.max = $FPM_PROCESS_MAX"; \
-        echo 'emergency_restart_threshold = 10'; \
-        echo 'emergency_restart_interval = 2s'; \
-        echo 'process_control_timeout = 10s'; \
-    } | tee -a /usr/local/etc/php-fpm.d/www.conf && \
     { \
         echo "log_errors = On"; \
         echo "max_execution_time = $PHP_MAX_EXECUTION_TIME"; \
@@ -192,8 +154,3 @@ COPY --from=composer:2.0 /usr/bin/composer /usr/bin/composer
 
 RUN mkdir /app
 WORKDIR /app
-
-COPY hiqdev-docker-entrypoint /usr/local/bin
-ENTRYPOINT ["hiqdev-docker-entrypoint"]
-CMD ["php-fpm"]
-
