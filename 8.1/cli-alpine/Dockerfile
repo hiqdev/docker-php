@@ -28,6 +28,7 @@ RUN set -xe \
         libxml2-dev \
         libmemcached-dev \
         imap-dev \
+        libgomp \
     && apk add --no-cache --virtual .tools \
         openssh-client \
         git \
