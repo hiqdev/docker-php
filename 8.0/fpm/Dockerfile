@@ -104,7 +104,7 @@ COPY php-socket.patch /tmp/php-socket.patch
 
 # Other extensions: ZIP, BCmath, imap, mailparse
 RUN apt-get update && apt-get install -y libc-client-dev libkrb5-dev libzip-dev libgmp3-dev librdkafka-dev \
-    && pecl install mailparse rdkafka-5.0.2 \
+    && pecl install mailparse rdkafka \
     && docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
     && docker-php-source extract && patch /usr/src/php/ext/sockets/config.m4 -i /tmp/php-socket.patch \
     && docker-php-ext-install zip bcmath imap soap pcntl gmp sockets \

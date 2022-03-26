@@ -99,7 +99,7 @@ RUN set -xe \
     # Opcache
     docker-php-ext-install opcache \
 
-    && pecl install rdkafka-5.0.2 \
+    && pecl install rdkafka \
     && docker-php-ext-enable rdkafka \
 
     # Memcached
