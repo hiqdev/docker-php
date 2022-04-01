@@ -22,7 +22,7 @@ if [ "$ENV" != "prod" ]; then
         echo "[ xdebug ] Enabled"
         sed -i "1s/^;//" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
         if [ -z "$XDEBUG_CLIENT_HOST" ]; then
-            if [ "$(uname -s)" = "Darwin" ] && [ -n "$(dig +short host.docker.internal)" ]; then
+            if [ -n "$(dig +short host.docker.internal)" ]; then
                 # MacOS
                 XDEBUG_CLIENT_HOST=$(dig +short host.docker.internal)
             else

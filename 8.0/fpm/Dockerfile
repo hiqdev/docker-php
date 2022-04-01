@@ -150,7 +150,7 @@ RUN echo "postfix postfix/mailname string $POSTFIX_MAILNAME" | debconf-set-selec
     rm -rf /var/lib/apt/lists/*
 
 # Composer
-COPY --from=composer:2.0 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Blackfire
 RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \

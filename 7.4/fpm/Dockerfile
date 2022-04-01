@@ -3,7 +3,6 @@ FROM php:7.4-fpm-buster
 ENV POSTFIX_MAILNAME hiqdev.com
 ENV ICU_RELEASE=70.1
 ENV XDEBUG_RELEASE=3.1.2
-ENV MEMCACHED_RELEASE=3.1.5
 
 # PHP-FPM options
 ENV FPM_MAX_CHILDREN 300
@@ -38,7 +37,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libjpeg62-turbo-dev \
         libpng-dev \
         libmagickwand-dev \
-        libmcrypt \
+        libmcrypt-dev \
         imagemagick \
         ghostscript \
         iproute2 \
@@ -140,7 +139,7 @@ RUN echo "postfix postfix/mailname string $POSTFIX_MAILNAME" | debconf-set-selec
     rm -rf /var/lib/apt/lists/*
 
 # Composer
-COPY --from=composer:2.0 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Blackfire
 RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
@@ -162,7 +161,7 @@ RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-
 # Install Memcached
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libmemcached-dev zlib1g-dev \
-    && pecl install memcached-$MEMCACHED_RELEASE \
+    && pecl install memcached \
     && docker-php-ext-enable memcached \
     && apt-get remove -y zlib1g-dev \
     && rm -r /var/lib/apt/lists/*
