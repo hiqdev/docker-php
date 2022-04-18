@@ -181,6 +181,8 @@ RUN { \
 
 # Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# FreeCDB
+COPY --from=hiqdev/freecdb /usr/bin/cdbmake /usr/bin/cdbdump /usr/bin/cdbget /usr/bin/cdbstats /usr/bin/
 
 RUN mkdir /app
 WORKDIR /app
