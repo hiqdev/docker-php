@@ -22,7 +22,7 @@ jobs:
           list-files: json
           filters: |
             version:
-              - 'src/*'
+              - 'src/**'
       - id: generate-jobs
         name: Generate Jobs
         run: |
