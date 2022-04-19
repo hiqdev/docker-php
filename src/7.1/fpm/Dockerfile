@@ -1,6 +1,7 @@
 FROM php:7.1-fpm
 
 ENV POSTFIX_MAILNAME hiqdev.com
+ENV ICU_RELEASE 71.1
 
 # PHP-FPM options
 ENV FPM_MAX_CHILDREN 300
@@ -22,7 +23,7 @@ RUN apt-get update
 # INTL
 # PHP_CPPFLAGS are used by the docker-php-ext-* scripts
 ENV PHP_CPPFLAGS="$PHP_CPPFLAGS -std=c++11"
-RUN curl -sS -o /tmp/icu.tar.gz -L http://download.icu-project.org/files/icu4c/59.1/icu4c-59_1-src.tgz && \
+RUN curl -sS -o /tmp/icu.tar.gz -L https://github.com/unicode-org/icu/releases/download/release-$(echo $ICU_RELEASE | tr '.' '-')/icu4c-$(echo $ICU_RELEASE | tr '.' '_')-src.tgz && \
     tar -zxf /tmp/icu.tar.gz -C /tmp && \
     cd /tmp/icu/source && \
     ./configure --prefix=/usr/local && \
