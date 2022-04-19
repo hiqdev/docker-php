@@ -1,5 +1,9 @@
 #!/bin/sh
 
+CHANGED_DIRS=$1
+
+echo $CHANGED_DIRS;
+
 cd src
 VERSIONS=$(ls -d */ | cut -f1 -d'/')
 
