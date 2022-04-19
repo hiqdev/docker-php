@@ -26,7 +26,7 @@ jobs:
       - id: generate-jobs
         name: Generate Jobs
         run: |
-          strategy="$(./scripts/generate-actions.sh '${{ steps.changes.outputs.version_files }}')"
+          strategy="$(./scripts/generate-actions.sh ${{ github.event_name }} '${{ steps.changes.outputs.version_files }}')"
           jq . <<<"$strategy" # sanity check / debugging aid
           echo "::set-output name=strategy::$strategy"
 
