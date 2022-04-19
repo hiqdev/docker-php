@@ -1,6 +1,7 @@
 name: Build
 
 on:
+  pull_request:
   push:
     branches:
       - 'master'
@@ -14,11 +15,18 @@ jobs:
     outputs:
       strategy: ${{ steps.generate-jobs.outputs.strategy }}
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          list-files: json
+          filters: |
+            version:
+              - 'src/**'
       - id: generate-jobs
         name: Generate Jobs
         run: |
-          strategy="$(./scripts/generate-actions.sh)"
+          strategy="$(./scripts/generate-actions.sh ${{ github.event_name }} '${{ steps.changes.outputs.version_files }}')"
           jq . <<<"$strategy" # sanity check / debugging aid
           echo "::set-output name=strategy::$strategy"
 
@@ -40,4 +48,4 @@ jobs:
         with:
           context: "{{defaultContext}}:src/${{ matrix.php }}/${{ matrix.tag }}"
           tags: "hiqdev/php:${{ matrix.php}}-${{ matrix.tag }}"
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
