@@ -99,18 +99,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends libpq-dev && \
     docker-php-ext-install pdo_pgsql pgsql && \
     rm -rf /var/lib/apt/lists/*
 
-# Temp patch. See https://github.com/php/php-src/issues/7986
-COPY php-socket.patch /tmp/php-socket.patch
-
 # Other extensions: ZIP, BCmath, imap, mailparse
 RUN apt-get update && apt-get install -y libc-client-dev libkrb5-dev libzip-dev libgmp3-dev librdkafka-dev \
     && pecl install mailparse rdkafka \
     && docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
-    && docker-php-source extract && patch /usr/src/php/ext/sockets/config.m4 -i /tmp/php-socket.patch \
     && docker-php-ext-install zip bcmath imap soap pcntl gmp sockets \
     && docker-php-ext-enable mailparse rdkafka \
     && apt-get remove -y libc-client-dev libkrb5-dev libzip-dev \
-    && docker-php-source delete \
     && rm -rf /var/lib/apt/lists/*
 
 # Tune configs
