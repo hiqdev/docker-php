@@ -21,9 +21,6 @@ ENV PHP_POST_MAX_SIZE 60M
 ENV PHP_UPLOAD_MAX_FILESIZE 25M
 ENV PHP_SESS_GC_MAXLIFETIME 2592000
 
-# Temp patch. See https://github.com/php/php-src/issues/7986
-COPY php-socket.patch /tmp/php-socket.patch
-
 RUN set -xe \
     && apk update \
     && apk add --no-cache --virtual .php-deps \
@@ -63,7 +60,6 @@ RUN set -xe \
         krb5-dev \
         libssh2-dev \
         zlib-dev \
-        patch \
     && \
     docker-php-ext-configure intl && \
     docker-php-ext-install intl && \
@@ -107,10 +103,7 @@ RUN set -xe \
     && docker-php-ext-enable memcached \
 
     # Sockets
-    && docker-php-source extract \
-    && patch /usr/src/php/ext/sockets/config.m4 -i /tmp/php-socket.patch \
     && docker-php-ext-install sockets \
-    && docker-php-source delete \
 
     # Blackfire
     && version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \

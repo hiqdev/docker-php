@@ -16,7 +16,8 @@ RUN apt-get update
 # INTL
 # PHP_CPPFLAGS are used by the docker-php-ext-* scripts
 ENV PHP_CPPFLAGS="$PHP_CPPFLAGS -std=c++11"
-RUN curl -sS -o /tmp/icu.tar.gz -L https://github.com/unicode-org/icu/releases/download/release-$(echo $ICU_RELEASE | tr '.' '-')/icu4c-$(echo $ICU_RELEASE | tr '.' '_')-src.tgz && \
+RUN export CC="gcc -DTRUE=1 -DFALSE=0" CXX="g++ -DTRUE=1 -DFALSE=0" && \
+    curl -sS -o /tmp/icu.tar.gz -L https://github.com/unicode-org/icu/releases/download/release-$(echo $ICU_RELEASE | tr '.' '-')/icu4c-$(echo $ICU_RELEASE | tr '.' '_')-src.tgz && \
     tar -zxf /tmp/icu.tar.gz -C /tmp && \
     cd /tmp/icu/source && \
     ./configure --prefix=/usr/local && \
