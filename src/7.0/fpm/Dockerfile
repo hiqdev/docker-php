@@ -35,7 +35,7 @@ RUN export CPPFLAGS="$CPPFLAGS -DU_USING_ICU_NAMESPACE=1" CC="gcc -DTRUE=1 -DFAL
 RUN apt-get install -y --no-install-recommends \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
-        libpng12-dev \
+        libpng-dev \
         libmagickwand-dev \
         imagemagick \
         ghostscript
