@@ -21,7 +21,7 @@ ENV PHP_SESS_GC_MAXLIFETIME 2592000
 RUN apt-get update
 
 # INTL
-RUN export CPPFLAGS+=" -DU_USING_ICU_NAMESPACE=1" && \
+RUN export CPPFLAGS="$CPPFLAGS -DU_USING_ICU_NAMESPACE=1" && \
     curl -sS -o /tmp/icu.tar.gz -L https://github.com/unicode-org/icu/releases/download/release-$(echo $ICU_RELEASE | tr '.' '-')/icu4c-$(echo $ICU_RELEASE | tr '.' '_')-src.tgz && \
     tar -zxf /tmp/icu.tar.gz -C /tmp && \
     cd /tmp/icu/source && \

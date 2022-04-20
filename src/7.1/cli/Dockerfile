@@ -1,7 +1,7 @@
 FROM php:7.1-cli
 
 ENV POSTFIX_MAILNAME hiqdev.com
-ENV ICU_RELEASE 71.1
+ENV ICU_RELEASE 68.1
 
 # PHP-FPM options
 ENV PHP_MAX_EXECUTION_TIME 3000
@@ -18,8 +18,8 @@ RUN apt-get update
 ENV PHP_CPPFLAGS="$PHP_CPPFLAGS -std=c++11"
 
 RUN export CC="gcc -DTRUE=1 -DFALSE=0" CXX="g++ -DTRUE=1 -DFALSE=0" && \
-    curl -sS -o /tmp/icu.tar.gz -L https://github.com/unicode-org/icu/releases/download/release-$(echo $ICU_RELEASE | tr '.' '-')/icu4c-$(echo $ICU_RELEASE | tr '.' '_')-src.tgz && tar -zxf /tmp/icu.tar.gz -C /tmp && cd /tmp/icu/source && ./configure --prefix=/usr/local && make && make install
-RUN docker-php-ext-configure intl --with-icu-dir=/usr/local && \
+    curl -sS -o /tmp/icu.tar.gz -L https://github.com/unicode-org/icu/releases/download/release-$(echo $ICU_RELEASE | tr '.' '-')/icu4c-$(echo $ICU_RELEASE | tr '.' '_')-src.tgz && tar -zxf /tmp/icu.tar.gz -C /tmp && cd /tmp/icu/source && ./configure --prefix=/usr/local && make && make install && \
+    docker-php-ext-configure intl --with-icu-dir=/usr/local && \
     docker-php-ext-install intl
 
 
