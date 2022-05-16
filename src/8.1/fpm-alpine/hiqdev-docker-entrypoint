@@ -15,7 +15,7 @@ if [ -n "$NEW_RELIC_LICENSE_KEY" ]; then
     fi
     if [ -n "$NEW_RELIC_APPNAME" ]; then
         echo "[ New Relic ] App name set to $NEW_RELIC_APPNAME"
-        sed -i -e "s/newrelic.appname[[:space:]]=[[:space:]].*/newrelic.appname=\"$NEW_RELIC_APPNAME\"/" \
+        sed -i -e "s/newrelic.appname[[:space:]]=[[:space:]].*/newrelic.appname=\"$NEW_RELIC_APPNAME\"/" $(php -r "echo(PHP_CONFIG_FILE_SCAN_DIR);")/newrelic.ini
     fi
 fi
 
