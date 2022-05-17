@@ -6,6 +6,8 @@ postconf -e myhostname=$(hostname)
 
 if [ -n "$NEW_RELIC_LICENSE_KEY" ]; then
     echo '[ New Relic ] Enabled'
+
+    sed -i 's/;extension/extension/' $(php -r "echo(PHP_CONFIG_FILE_SCAN_DIR);")/newrelic.ini
     sed -i -e "s/REPLACE_WITH_REAL_KEY/$NEW_RELIC_LICENSE_KEY/" $(php -r "echo(PHP_CONFIG_FILE_SCAN_DIR);")/newrelic.ini
     sed -i -e '$anewrelic.distributed_tracing_enabled=true' $(php -r "echo(PHP_CONFIG_FILE_SCAN_DIR);")/newrelic.ini
 
