@@ -149,10 +149,10 @@ RUN { \
         echo "xdebug.client_host=127.0.0.1"; \
         echo "xdebug.client_port=9003"; \
         echo "xdebug.start_with_request=trigger"; \
-    } | tee -a /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    } | tee -a /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
 
     # Disable New Relic by default
-    && sed -i "s/extension = /;extension =/" /usr/local/etc/php/conf.d/newrelic.ini \
+    sed -i "s/extension = /;extension =/" /usr/local/etc/php/conf.d/newrelic.ini && \
 
     # Tune configs
     sed -i "s/max_children\s*=\s*[[:digit:]]\+/max_children = $FPM_MAX_CHILDREN/" /usr/local/etc/php-fpm.d/www.conf && \
