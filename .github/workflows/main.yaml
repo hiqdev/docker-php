@@ -34,7 +34,7 @@ jobs:
   build:
     needs: generate-jobs
     strategy: ${{ fromJson(needs.generate-jobs.outputs.strategy) }}
-    name: ${{ matrix.name }}
+    name: build-name
     runs-on: ubuntu-latest
     steps:
       - name: Set up Docker Buildx
