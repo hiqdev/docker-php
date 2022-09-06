@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: dorny/paths-filter@v2
-        if: ${{ github.event_name }} == 'pull_request'
+        if: ${{ github.event_name != 'schedule' }}
         id: changes
         with:
           list-files: json
