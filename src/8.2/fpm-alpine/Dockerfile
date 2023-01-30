@@ -1,4 +1,4 @@
-FROM php:8.1-fpm-alpine
+FROM php:8.2-fpm-alpine
 
 ENV POSTFIX_MAILNAME hiqdev.com
 ENV XDEBUG_RELEASE=3.2.0
@@ -117,10 +117,10 @@ RUN set -xe \
 
     && apk add gnu-libiconv=1.15-r3 --update-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.13/community/ --allow-untrusted \
 
-    # New Relic
-    && curl -L https://download.newrelic.com/php_agent/archive/$NEW_RELIC_AGENT_VERSION/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl.tar.gz | tar -C /tmp -zx \
-    && NR_INSTALL_USE_CP_NOT_LN=1 NR_INSTALL_SILENT=1 /tmp/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl/newrelic-install install \
-    && rm -rf /tmp/newrelic-php5-* /tmp/nrinstall* \
+#    # New Relic
+#    && curl -L https://download.newrelic.com/php_agent/archive/$NEW_RELIC_AGENT_VERSION/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl.tar.gz | tar -C /tmp -zx \
+#    && NR_INSTALL_USE_CP_NOT_LN=1 NR_INSTALL_SILENT=1 /tmp/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl/newrelic-install install \
+#    && rm -rf /tmp/newrelic-php5-* /tmp/nrinstall* \
 
     && { find /usr/local/lib -type f -print0 | xargs -0r strip --strip-all -p 2>/dev/null || true; } \
     && apk del .build-deps \
@@ -152,7 +152,7 @@ RUN { \
     } | tee -a /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
 
     # Disable New Relic by default
-    sed -i "s/extension = /;extension =/" /usr/local/etc/php/conf.d/newrelic.ini && \
+#    sed -i "s/extension = /;extension =/" /usr/local/etc/php/conf.d/newrelic.ini && \
 
     # Tune configs
     sed -i "s/max_children\s*=\s*[[:digit:]]\+/max_children = $FPM_MAX_CHILDREN/" /usr/local/etc/php-fpm.d/www.conf && \
