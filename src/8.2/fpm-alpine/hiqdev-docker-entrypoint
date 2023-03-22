@@ -67,5 +67,13 @@ if [ "${1#-}" != "$1" ]; then
     set -- php-fpm "$@"
 fi
 
-exec "$@"
+# first arg is `sh` or `bash`
+if [ "$1" = 'sh' ] || [ "$1" = 'bash' ]; then
+    # GitLab Says:
+    # To ensure a job can run, its Docker image must:
+    #  - Provide sh or bash
+    #  - Define an ENTRYPOINT that starts a shell when passed sh/bash as argument
+    set -- "$@"
+fi
 
+exec "$@"
