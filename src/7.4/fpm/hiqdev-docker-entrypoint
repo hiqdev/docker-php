@@ -24,7 +24,7 @@ if [ "$ENV" != "prod" ]; then
         if [ -z "$XDEBUG_CLIENT_HOST" ]; then
             docker_host_ip=$(dig +time=1 +tries=2 +short host.docker.internal)
             exit_code=$?
-            if [ $exit_code -eq 0 ]; then
+            if [ $exit_code -eq 0 ] && [ "$docker_host_ip" != "" ]; then
                 # MacOS
                 XDEBUG_CLIENT_HOST=$docker_host_ip
             else
