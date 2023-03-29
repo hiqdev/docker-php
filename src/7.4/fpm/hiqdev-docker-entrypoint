@@ -22,9 +22,11 @@ if [ "$ENV" != "prod" ]; then
         echo "[ xdebug ] Enabled"
         sed -i "1s/^;//" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
         if [ -z "$XDEBUG_CLIENT_HOST" ]; then
-            if [ -n "$(dig +short host.docker.internal)" ]; then
+            docker_host_ip=$(dig +time=1 +tries=2 +short host.docker.internal)
+            exit_code=$?
+            if [ $exit_code -eq 0 ]; then
                 # MacOS
-                XDEBUG_CLIENT_HOST=$(dig +short host.docker.internal)
+                XDEBUG_CLIENT_HOST=$docker_host_ip
             else
                 # Linux
                 XDEBUG_CLIENT_HOST=$(ip route show | awk '/default/ {print $3}')
