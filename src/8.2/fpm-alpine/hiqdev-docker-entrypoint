@@ -4,7 +4,7 @@ set -e
 # Update `myhostname` in Postfix in order to send emails
 postconf -e myhostname=$(hostname)
 
-if [ -n "$NEW_RELIC_LICENSE_KEY" ]; then
+if [ -z "$NEW_RELIC_LICENSE_KEY" ]; then
     echo '[ New Relic ] Enabled'
 
     sed -i 's/;extension/extension/' $(php -r "echo(PHP_CONFIG_FILE_SCAN_DIR);")/newrelic.ini
