@@ -4,22 +4,22 @@ set -e
 # Update `myhostname` in Postfix in order to send emails
 postconf -e myhostname=$(hostname)
 
-if [ -z "$NEW_RELIC_LICENSE_KEY" ]; then
-    echo '[ New Relic ] Enabled'
-
-    sed -i 's/;extension/extension/' $(php -r "echo(PHP_CONFIG_FILE_SCAN_DIR);")/newrelic.ini
-    sed -i -e "s/REPLACE_WITH_REAL_KEY/$NEW_RELIC_LICENSE_KEY/" $(php -r "echo(PHP_CONFIG_FILE_SCAN_DIR);")/newrelic.ini
-    sed -i -e '$anewrelic.distributed_tracing_enabled=true' $(php -r "echo(PHP_CONFIG_FILE_SCAN_DIR);")/newrelic.ini
-
-    if [ -n "$NEW_RELIC_DAEMON_ADDRESS" ]; then
-        echo "[ New Relic ] Daemon address set to $NEW_RELIC_DAEMON_ADDRESS:31339"
-        echo "newrelic.daemon.address=\"$NEW_RELIC_DAEMON_ADDRESS:31339\"" >> $(php -r "echo(PHP_CONFIG_FILE_SCAN_DIR);")/newrelic.ini
-    fi
-    if [ -n "$NEW_RELIC_APPNAME" ]; then
-        echo "[ New Relic ] App name set to $NEW_RELIC_APPNAME"
-        sed -i -e "s/newrelic.appname[[:space:]]=[[:space:]].*/newrelic.appname=\"$NEW_RELIC_APPNAME\"/" $(php -r "echo(PHP_CONFIG_FILE_SCAN_DIR);")/newrelic.ini
-    fi
-fi
+#if [ -z "$NEW_RELIC_LICENSE_KEY" ]; then
+#    echo '[ New Relic ] Enabled'
+#
+#    sed -i 's/;extension/extension/' $(php -r "echo(PHP_CONFIG_FILE_SCAN_DIR);")/newrelic.ini
+#    sed -i -e "s/REPLACE_WITH_REAL_KEY/$NEW_RELIC_LICENSE_KEY/" $(php -r "echo(PHP_CONFIG_FILE_SCAN_DIR);")/newrelic.ini
+#    sed -i -e '$anewrelic.distributed_tracing_enabled=true' $(php -r "echo(PHP_CONFIG_FILE_SCAN_DIR);")/newrelic.ini
+#
+#    if [ -n "$NEW_RELIC_DAEMON_ADDRESS" ]; then
+#        echo "[ New Relic ] Daemon address set to $NEW_RELIC_DAEMON_ADDRESS:31339"
+#        echo "newrelic.daemon.address=\"$NEW_RELIC_DAEMON_ADDRESS:31339\"" >> $(php -r "echo(PHP_CONFIG_FILE_SCAN_DIR);")/newrelic.ini
+#    fi
+#    if [ -n "$NEW_RELIC_APPNAME" ]; then
+#        echo "[ New Relic ] App name set to $NEW_RELIC_APPNAME"
+#        sed -i -e "s/newrelic.appname[[:space:]]=[[:space:]].*/newrelic.appname=\"$NEW_RELIC_APPNAME\"/" $(php -r "echo(PHP_CONFIG_FILE_SCAN_DIR);")/newrelic.ini
+#    fi
+#fi
 
 if [ "$ENV" != "prod" ]; then
     echo "Environment is set to DEV"
