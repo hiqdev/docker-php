@@ -3,7 +3,7 @@ FROM php:8.2-fpm-alpine
 ENV POSTFIX_MAILNAME hiqdev.com
 ENV XDEBUG_RELEASE=3.2.0
 ENV MEMCACHED_RELEASE=3.2.0
-ENV NEW_RELIC_AGENT_VERSION=10.5.0.317
+ENV NEW_RELIC_AGENT_VERSION=10.9.0.324
 
 # PHP-FPM options
 ENV FPM_MAX_CHILDREN 300
@@ -117,10 +117,10 @@ RUN set -xe \
 
     && apk add gnu-libiconv=1.15-r3 --update-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.13/community/ --allow-untrusted \
 
-#    # New Relic
-#    && curl -L https://download.newrelic.com/php_agent/archive/$NEW_RELIC_AGENT_VERSION/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl.tar.gz | tar -C /tmp -zx \
-#    && NR_INSTALL_USE_CP_NOT_LN=1 NR_INSTALL_SILENT=1 /tmp/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl/newrelic-install install \
-#    && rm -rf /tmp/newrelic-php5-* /tmp/nrinstall* \
+    # New Relic
+    && curl -L https://download.newrelic.com/php_agent/archive/$NEW_RELIC_AGENT_VERSION/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl.tar.gz | tar -C /tmp -zx \
+    && NR_INSTALL_USE_CP_NOT_LN=1 NR_INSTALL_SILENT=1 /tmp/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl/newrelic-install install \
+    && rm -rf /tmp/newrelic-php5-* /tmp/nrinstall* \
 
     && { find /usr/local/lib -type f -print0 | xargs -0r strip --strip-all -p 2>/dev/null || true; } \
     && apk del .build-deps \
