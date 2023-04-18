@@ -40,7 +40,7 @@ if [ "$ENV" != "prod" ]; then
         sed -i "1s/^;//" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
         if [ -z "$XDEBUG_CLIENT_HOST" ]; then
-            docker_host_ip=$(dig +time=1 +tries=2 +short host.docker.internal || true)
+            docker_host_ip=$( (dig +time=1 +tries=2 +short host.docker.internal | grep -v ';;') || true )
             if [ "$docker_host_ip" != "" ]; then
                 # MacOS
                 XDEBUG_CLIENT_HOST=$docker_host_ip
