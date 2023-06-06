@@ -18,7 +18,7 @@ jobs:
     outputs:
       strategy: ${{ steps.generate-jobs.outputs.strategy }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
         if: ${{ github.event_name != 'schedule' }}
         id: changes
@@ -32,7 +32,7 @@ jobs:
         run: |
           strategy="$(./scripts/generate-actions.sh ${{ github.event_name }} '${{ steps.changes.outputs.version_files }}' "${PERIODIC_UPDATES_MIN_VERSION}")"
           jq . <<<"$strategy" # sanity check / debugging aid
-          echo "::set-output name=strategy::$strategy"
+          echo "strategy=$strategy" >> $GITHUB_OUTPUT
 
   build:
     needs: generate-jobs
