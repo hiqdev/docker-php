@@ -3,11 +3,17 @@
 EVENT_NAME=$1
 CHANGED_DIRS=$2
 PERIODIC_UPDATES_MIN_VERSION=$3
+MIN_SUPPORTED_VERSION=$4
 
 cd src
 VERSIONS=$(ls -d */ | cut -f1 -d'/')
 
 for VERSION in $VERSIONS; do
+    # Do not build old versions 
+    if [[ $VERSION < $MIN_SUPPORTED_VERSION ]]; then
+        continue
+    fi
+
     # Do not include versions that are not supported by periodic updates
     if [[ $EVENT_NAME == 'schedule' ]] && [[ $VERSION < $PERIODIC_UPDATES_MIN_VERSION ]]; then
         continue

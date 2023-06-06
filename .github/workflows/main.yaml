@@ -2,6 +2,7 @@ name: Build
 
 env:
   PERIODIC_UPDATES_MIN_VERSION: 7.4
+  MIN_SUPPORTED_VERSION: 7.3
 
 on:
   pull_request:
@@ -30,7 +31,7 @@ jobs:
       - id: generate-jobs
         name: Generate Jobs
         run: |
-          strategy="$(./scripts/generate-actions.sh ${{ github.event_name }} '${{ steps.changes.outputs.version_files }}' "${PERIODIC_UPDATES_MIN_VERSION}")"
+          strategy="$(./scripts/generate-actions.sh ${{ github.event_name }} '${{ steps.changes.outputs.version_files }}' "${PERIODIC_UPDATES_MIN_VERSION}" "${{ MIN_SUPPORTED_VERSION }}")"
           jq . <<<"$strategy" # sanity check / debugging aid
           echo "strategy=$strategy" >> $GITHUB_OUTPUT
 
