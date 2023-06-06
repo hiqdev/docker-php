@@ -104,8 +104,6 @@ RUN set -xe \
     && docker-php-ext-enable memcached \
 
     # Sockets
-    && docker-php-source extract \
-    && patch /usr/src/php/ext/sockets/config.m4 -i /tmp/php-socket.patch \
     && docker-php-ext-install sockets \
     && docker-php-source delete \
 
