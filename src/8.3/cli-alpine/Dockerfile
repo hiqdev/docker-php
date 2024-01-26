@@ -1,8 +1,10 @@
 FROM php:8.3-cli-alpine
 
 ENV POSTFIX_MAILNAME hiqdev.com
-ENV XDEBUG_RELEASE=3.2.0
+ENV XDEBUG_RELEASE=3.3.1
 ENV MEMCACHED_RELEASE=3.2.0
+ENV PECL_SSH2_RELEASE=1.4
+ENV GNU_LIBICONV_RELEASE=1.17-r2
 
 # PHP options
 ENV PHP_MAX_EXECUTION_TIME 3000
@@ -67,7 +69,7 @@ RUN set -xe \
     docker-php-ext-enable imagick && \
 
     # SSH
-    pecl install ssh2-1.3.1 && \
+    pecl install ssh2-$PECL_SSH2_RELEASE && \
     docker-php-ext-enable ssh2 && \
 
     # GD
@@ -106,7 +108,7 @@ RUN set -xe \
     && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz \
     && echo 'Blackfire has been installed' \
 
-    && apk add gnu-libiconv=1.15-r3 --update-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.13/community/ --allow-untrusted \
+    && apk add gnu-libiconv="$GNU_LIBICONV_RELEASE" --update-cache --repository http://dl-cdn.alpinelinux.org/alpine/latest-stable/community/ --allow-untrusted \
 
     && { find /usr/local/lib -type f -print0 | xargs -0r strip --strip-all -p 2>/dev/null || true; } \
     && apk del .build-deps \
