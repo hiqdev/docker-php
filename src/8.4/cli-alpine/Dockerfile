@@ -60,10 +60,10 @@ RUN set -xe \
     docker-php-ext-install intl && \
     docker-php-ext-enable intl && \
 
-    docker-php-ext-configure imap --with-kerberos --with-imap-ssl && \
+    pecl install imap && \
     pecl install mailparse && \
-    docker-php-ext-install zip bcmath imap soap pcntl gmp && \
-    docker-php-ext-enable mailparse && \
+    docker-php-ext-install zip bcmath soap pcntl gmp && \
+    docker-php-ext-enable mailparse imap && \
 
     pecl install imagick && \
     docker-php-ext-enable imagick && \
