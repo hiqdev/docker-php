@@ -103,7 +103,7 @@ RUN set -xe \
     && apk del .build-deps \
     && rm -rf /tmp/* /usr/local/lib/php/doc/* /var/cache/apk/* \
 
-ENV LD_PRELOAD /usr/lib/preloadable_libiconv.so
+ENV LD_PRELOAD=/usr/lib/preloadable_libiconv.so
 
 # General settings
 RUN { \
