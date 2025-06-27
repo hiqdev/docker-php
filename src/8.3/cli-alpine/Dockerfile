@@ -97,6 +97,10 @@ RUN set -xe \
     # Sockets
     && docker-php-ext-install sockets \
 
+    # MongoDB
+    && pecl install mongodb \
+    && docker-php-ext-enable mongodb \
+
     # Blackfire
     && version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && architecture=$(case $(uname -m) in i386 | i686 | x86) echo "i386" ;; x86_64 | amd64) echo "amd64" ;; aarch64 | arm64 | armv8) echo "arm64" ;; *) echo "amd64" ;; esac) \

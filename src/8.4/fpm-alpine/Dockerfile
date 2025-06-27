@@ -107,6 +107,10 @@ RUN set -xe \
     # Sockets
     && docker-php-ext-install sockets \
 
+    # MongoDB
+    && pecl install mongodb \
+    && docker-php-ext-enable mongodb \
+
     && apk add gnu-libiconv=$GNU_LIBICONV_RELEASE --update-cache --repository http://dl-cdn.alpinelinux.org/alpine/latest-stable/community/ --allow-untrusted \
 
     # New Relic

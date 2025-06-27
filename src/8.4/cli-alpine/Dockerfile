@@ -94,6 +94,10 @@ RUN set -xe \
     && pecl install memcached-$MEMCACHED_RELEASE \
     && docker-php-ext-enable memcached \
 
+    # MongoDB
+    && pecl install mongodb \
+    && docker-php-ext-enable mongodb \
+
     # Sockets
     && docker-php-ext-install sockets \
 
