@@ -5,7 +5,7 @@ set -e
 postconf -e myhostname=$(hostname)
 
 if [ "$ENV" = "dev" ]; then
-    # Diable Opcache
+    # Disable Opcache
     echo "Environment is set to DEV"
     echo "[ opcache ] Disabled"
     sed -i "s/opcache.enable\s*=\s*[[:digit:]]/opcache.enable=0/" /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini

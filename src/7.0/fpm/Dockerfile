@@ -53,7 +53,7 @@ RUN { \
     echo "opcache.enable=1"; \
     echo "opcache.memory_consumption=1024"; \
     echo "opcache.max_accelerated_files=9000"; \
-    echo "opcache_revalidate_freq=120"; \
+    echo "opcache.revalidate_freq=30"; \
     echo "opcache.interned_strings_buffer=16"; \
 } | tee -a /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
 
