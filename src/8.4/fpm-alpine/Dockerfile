@@ -165,12 +165,14 @@ RUN { \
         echo '[www]'; \
         echo "pm.max_requests = $FPM_MAX_REQUESTS"; \
         echo 'catch_workers_output = yes'; \
+    } | tee -a /usr/local/etc/php-fpm.d/www.conf && \
+    { \
         echo '[global]'; \
         echo "process.max = $FPM_PROCESS_MAX"; \
         echo 'emergency_restart_threshold = 10'; \
         echo 'emergency_restart_interval = 2s'; \
         echo 'process_control_timeout = 10s'; \
-    } | tee -a /usr/local/etc/php-fpm.d/www.conf && \
+    } | tee -a /usr/local/etc/php-fpm.conf && \
     { \
         echo "log_errors = On"; \
         echo "max_execution_time = $PHP_MAX_EXECUTION_TIME"; \
