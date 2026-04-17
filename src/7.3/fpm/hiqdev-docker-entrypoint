@@ -5,7 +5,7 @@ set -e
 postconf -e myhostname=$(hostname)
 
 if [ "$ENV" != "prod" ]; then
-    # Diable Opcache
+    # Disable Opcache
     echo "Environment is set to DEV"
     echo "[ opcache ] Configuring dev mode"
     sed -i "s/opcache.revalidate_freq\s*=\s*[[:digit:]]/opcache.revalidate_freq=0/" /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
