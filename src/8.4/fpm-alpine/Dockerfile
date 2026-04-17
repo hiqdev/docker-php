@@ -130,6 +130,9 @@ RUN { \
         echo "memory_limit=256M"; \
     } | tee -a /usr/local/etc/php/conf.d/docker-php-general.ini \
 
+    # Disable Git safe directory check
+    && git config --global --add safe.directory '*' \
+
     && { \
         echo "opcache.enable=1"; \
         echo "opcache.memory_consumption=1024"; \
