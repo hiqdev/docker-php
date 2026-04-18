@@ -84,9 +84,6 @@ RUN set -xe \
     pecl install "xdebug-$XDEBUG_RELEASE" && \
     docker-php-ext-enable xdebug && \
 
-    # Opcache
-    docker-php-ext-install opcache \
-
     && pecl install rdkafka \
     && docker-php-ext-enable rdkafka \
 

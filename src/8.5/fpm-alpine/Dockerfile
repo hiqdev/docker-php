@@ -76,7 +76,8 @@ RUN set -xe \
     docker-php-ext-install zip bcmath soap pcntl gmp && \
     docker-php-ext-enable mailparse imap && \
 
-    install-php-extensions Imagick/imagick@65e27f2bc0 && \
+    pecl install imagick && \
+    docker-php-ext-enable imagick && \
 
     # SSH
     pecl install ssh2-$PECL_SSH2_RELEASE && \
@@ -93,9 +94,6 @@ RUN set -xe \
     # XDebug
     pecl install "xdebug-$XDEBUG_RELEASE" && \
     docker-php-ext-enable xdebug && \
-
-    # Opcache
-    docker-php-ext-install opcache \
 
     && pecl install rdkafka \
     && docker-php-ext-enable rdkafka \
