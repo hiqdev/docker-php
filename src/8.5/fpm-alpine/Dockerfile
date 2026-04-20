@@ -93,7 +93,7 @@ RUN set -xe \
 
     # XDebug
     pecl install "xdebug-$XDEBUG_RELEASE" && \
-    docker-php-ext-enable xdebug && \
+    docker-php-ext-enable xdebug \
 
     && pecl install rdkafka \
     && docker-php-ext-enable rdkafka \
