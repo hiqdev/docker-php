@@ -23,8 +23,6 @@ ENV PHP_POST_MAX_SIZE=60M
 ENV PHP_UPLOAD_MAX_FILESIZE=25M
 ENV PHP_SESS_GC_MAXLIFETIME=2592000
 
-COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-
 RUN set -xe \
     && apk update \
     && apk add --no-cache --virtual .php-deps \

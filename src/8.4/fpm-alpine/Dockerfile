@@ -24,8 +24,6 @@ ENV PHP_POST_MAX_SIZE=60M
 ENV PHP_UPLOAD_MAX_FILESIZE=25M
 ENV PHP_SESS_GC_MAXLIFETIME=2592000
 
-COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-
 RUN set -xe \
     && apk update \
     && apk add --no-cache --virtual .php-deps \
@@ -77,7 +75,8 @@ RUN set -xe \
     docker-php-ext-install zip bcmath soap pcntl gmp && \
     docker-php-ext-enable mailparse imap && \
 
-    install-php-extensions Imagick/imagick@65e27f2bc0 && \
+    pecl install imagick && \
+    docker-php-ext-enable imagick && \
 
     # SSH
     pecl install ssh2-$PECL_SSH2_RELEASE && \
