@@ -1,4 +1,4 @@
-FROM php:8.1-fpm-alpine3.17
+FROM php:8.1-fpm-alpine
 
 ENV POSTFIX_MAILNAME hiqdev.com
 ENV XDEBUG_RELEASE=3.2.0

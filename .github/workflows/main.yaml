@@ -52,4 +52,5 @@ jobs:
         with:
           context: "{{defaultContext}}:src/${{ matrix.php }}/${{ matrix.tag }}"
           tags: "hiqdev/php:${{ matrix.php}}-${{ matrix.tag }}"
+          pull: true
           push: ${{ github.event_name != 'pull_request' }}
