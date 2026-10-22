@@ -54,5 +54,5 @@ jobs:
           tags: "hiqdev/php:${{ matrix.php}}-${{ matrix.tag }}"
           pull: true
           secrets: |
-            github_token=${{ secrets.GITHUB_TOKEN }}
+            github_token=${{ secrets.PIE_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
           push: ${{ github.event_name != 'pull_request' }}
