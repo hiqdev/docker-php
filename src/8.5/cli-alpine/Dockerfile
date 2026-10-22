@@ -1,5 +1,7 @@
 FROM php:8.5-cli-alpine
 
+COPY --from=ghcr.io/php/pie:1.5.3-bin /pie /usr/local/bin/pie
+
 ENV POSTFIX_MAILNAME=hiqdev.com
 ENV XDEBUG_RELEASE=3.5.1
 ENV MEMCACHED_RELEASE=3.4.0
@@ -61,12 +63,11 @@ RUN set -xe \
     docker-php-ext-enable intl && \
 
     pecl install imap && \
-    pecl install mailparse && \
+    pie install pecl/mailparse && \
     docker-php-ext-install zip bcmath soap pcntl gmp && \
-    docker-php-ext-enable mailparse imap && \
+    docker-php-ext-enable imap && \
 
-    pecl install imagick && \
-    docker-php-ext-enable imagick && \
+    pie install imagick/imagick && \
 
     # SSH
     pecl install ssh2-$PECL_SSH2_RELEASE && \
@@ -81,19 +82,15 @@ RUN set -xe \
     docker-php-ext-install pdo_pgsql pgsql && \
 
     # XDebug
-    pecl install "xdebug-$XDEBUG_RELEASE" && \
-    docker-php-ext-enable xdebug \
+    pie install "xdebug/xdebug:$XDEBUG_RELEASE" \
 
-    && pecl install rdkafka \
-    && docker-php-ext-enable rdkafka \
+    && pie install rdkafka/rdkafka \
 
     # Memcached
-    && pecl install memcached-$MEMCACHED_RELEASE \
-    && docker-php-ext-enable memcached \
+    && pie install "php-memcached/php-memcached:$MEMCACHED_RELEASE" \
 
     # MongoDB
-    && pecl install mongodb \
-    && docker-php-ext-enable mongodb \
+    && pie install mongodb/mongodb-extension \
 
     # Sockets
     && docker-php-ext-install sockets \
