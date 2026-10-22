@@ -53,4 +53,6 @@ jobs:
           context: "{{defaultContext}}:src/${{ matrix.php }}/${{ matrix.tag }}"
           tags: "hiqdev/php:${{ matrix.php}}-${{ matrix.tag }}"
           pull: true
+          secrets: |
+            github_token=${{ secrets.GITHUB_TOKEN }}
           push: ${{ github.event_name != 'pull_request' }}

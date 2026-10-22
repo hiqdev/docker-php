@@ -17,7 +17,11 @@ ENV PHP_POST_MAX_SIZE 60M
 ENV PHP_UPLOAD_MAX_FILESIZE 25M
 ENV PHP_SESS_GC_MAXLIFETIME 2592000
 
-RUN set -xe \
+RUN --mount=type=secret,id=github_token \
+    set -xe \
+    # PIE downloads extension sources from GitHub; authenticate to avoid anonymous rate limits.
+    # Tracing is off while the token is read so that it never lands in build logs.
+    && { set +x; if [ -r /run/secrets/github_token ]; then export COMPOSER_AUTH="{\"github-oauth\":{\"github.com\":\"$(cat /run/secrets/github_token)\"}}"; fi; set -x; } \
     && apk update \
     && apk add --no-cache --virtual .php-deps \
         imagemagick \
