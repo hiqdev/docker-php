@@ -5,7 +5,8 @@ COPY --from=ghcr.io/php/pie:1.5.3-bin /pie /usr/local/bin/pie
 ENV POSTFIX_MAILNAME=hiqdev.com
 ENV XDEBUG_RELEASE=3.5.1
 ENV MEMCACHED_RELEASE=3.4.0
-ENV PECL_SSH2_RELEASE=1.5.0
+ENV PECL_SSH2_RELEASE=1.6.1
+ENV IMAP_COMMIT=c441c79add125f5a01f88332805221edeebe47b0
 ENV GNU_LIBICONV_RELEASE=1.18-r0
 
 # PHP options
@@ -66,16 +67,17 @@ RUN --mount=type=secret,id=github_token \
     docker-php-ext-install intl && \
     docker-php-ext-enable intl && \
 
-    pecl install imap && \
+    mkdir -p /usr/src/php/ext/imap && \
+    curl -fsSL "https://github.com/php/pecl-mail-imap/archive/$IMAP_COMMIT.tar.gz" | tar -xz -C /usr/src/php/ext/imap --strip-components=1 && \
+    docker-php-ext-configure imap --with-imap-ssl && \
+    docker-php-ext-install imap && \
     pie install pecl/mailparse && \
     docker-php-ext-install zip bcmath soap pcntl gmp && \
-    docker-php-ext-enable imap && \
 
     pie install imagick/imagick && \
 
     # SSH
-    pecl install ssh2-$PECL_SSH2_RELEASE && \
-    docker-php-ext-enable ssh2 && \
+    pie install "pecl/ssh2:$PECL_SSH2_RELEASE" && \
 
     # GD
     export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" && \
