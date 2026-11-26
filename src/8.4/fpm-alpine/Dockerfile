@@ -152,10 +152,10 @@ RUN { \
     } | tee -a /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
 
     # Tune configs
-    sed -i "s/max_children\s*=\s*[[:digit:]]\+/max_children = $FPM_MAX_CHILDREN/" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i "s/start_servers\s*=\s*[[:digit:]]\+/start_servers = $FPM_START_SERVERS/" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i "s/min_spare_servers\s*=\s*[[:digit:]]\+/min_spare_servers = $FPM_MIN_SPARE_SERVERS/" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i "s/pm.max_spare_servers\s*=\s*[[:digit:]]\+/pm.max_spare_servers = $FPM_MAX_SPARE_SERVERS/" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i "s/max_children\s*=\s*[[:digit:]]\+/max_children = \${FPM_MAX_CHILDREN}/" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i "s/start_servers\s*=\s*[[:digit:]]\+/start_servers = \${FPM_START_SERVERS}/" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i "s/min_spare_servers\s*=\s*[[:digit:]]\+/min_spare_servers = \${FPM_MIN_SPARE_SERVERS}/" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i "s/pm.max_spare_servers\s*=\s*[[:digit:]]\+/pm.max_spare_servers = \${FPM_MAX_SPARE_SERVERS}/" /usr/local/etc/php-fpm.d/www.conf && \
 
     # FPM monitoring
     sed -i "s/.*pm.status_path = .*$/pm.status_path = \/fpm_status/g" /usr/local/etc/php-fpm.d/www.conf && \
@@ -163,12 +163,12 @@ RUN { \
     sed -i "s/.*ping.response = .*$/ping.response = pong/g" /usr/local/etc/php-fpm.d/www.conf && \
     { \
         echo '[www]'; \
-        echo "pm.max_requests = $FPM_MAX_REQUESTS"; \
+        echo 'pm.max_requests = ${FPM_MAX_REQUESTS}'; \
         echo 'catch_workers_output = yes'; \
     } | tee -a /usr/local/etc/php-fpm.d/www.conf && \
     { \
         echo '[global]'; \
-        echo "process.max = $FPM_PROCESS_MAX"; \
+        echo 'process.max = ${FPM_PROCESS_MAX}'; \
         echo 'emergency_restart_threshold = 10'; \
         echo 'emergency_restart_interval = 2s'; \
         echo 'process_control_timeout = 10s'; \
